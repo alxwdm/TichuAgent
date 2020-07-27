@@ -8,7 +8,6 @@ from collections import defaultdict
 
 from env.card import Card
 
-
 class Cards():
 
     size = None
@@ -28,7 +27,7 @@ class Cards():
 
         self.size = len(cards)
 
-        self.get_type()
+        self.set_type_and_power()
 
     # a nice visualization of all cards in the set
     def show(self):
@@ -45,7 +44,7 @@ class Cards():
         return sum([card.points for crd in self.cards])
 
     # determine which combination (if any) is this card set
-    def get_combination(self):
+    def set_type_and_power(self):
         card_set = self.cards
         card_set.sort()
 
@@ -66,7 +65,7 @@ class Cards():
                 self.power = card_set[0].power
                 return
             # phoenix pair
-            elif self.phoenix_flag
+            elif self.phoenix_flag:
                 self.type = 'pair'
                 self.power = card_set[1].power
                 return
@@ -182,12 +181,7 @@ class Cards():
             self.type = 'hand'
             self.power = 0
 
-
     # get all available combinations from this card set
     def get_available_combinations(self):
     	# TODO
-
-
-
-
-                
+       
