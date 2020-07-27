@@ -183,5 +183,6 @@ class Cards():
 
     # get all available combinations from this card set
     def get_available_combinations(self):
-    	# TODO
+        # TODO
+        return
        
