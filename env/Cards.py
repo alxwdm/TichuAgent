@@ -6,7 +6,7 @@
 import random
 from collections import defaultdict
 
-from env.card import Card
+from env.Card import Card
 
 class Cards():
 
