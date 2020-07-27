@@ -168,7 +168,7 @@ class Cards():
                     elif i % 2 == 1 and card_set[i+1].power + 1 == card_set[i+2].power:
                         pass
                     elif phoenix_used:
-                	    is_pair_seq = False
+                        is_pair_seq = False
                         break
                     else:
                         phoenix_used = True
