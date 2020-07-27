@@ -161,17 +161,17 @@ class Cards():
                     break
             # phoenix pair sequence
             if phoenix_flag:
-            phoenix_used = False
-            for i in range(len(card_set)-2):
-                if i % 2 == 0 and card_set[i+1].power == card_set[i+2].power:
-                    pass
-                elif i % 2 == 1 and card_set[i+1].power + 1 == card_set[i+2].power:
-                    pass
-                elif phoenix_used:
-                	is_pair_seq = False
-                    break
-                else:
-                    phoenix_used = True
+                phoenix_used = False
+                for i in range(len(card_set)-2):
+                    if i % 2 == 0 and card_set[i+1].power == card_set[i+2].power:
+                        pass
+                    elif i % 2 == 1 and card_set[i+1].power + 1 == card_set[i+2].power:
+                        pass
+                    elif phoenix_used:
+                	    is_pair_seq = False
+                        break
+                    else:
+                        phoenix_used = True
             if is_pair_seq == True:
                 self.type = 'pair_seq'
                 self.power = card_set[-1].power
