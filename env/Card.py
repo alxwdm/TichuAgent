@@ -25,7 +25,7 @@ CARD_VALUES = {'2': 2,
                'A': 14,
                'Dragon': 15,
                'Phoenix': 0.5,
-               'Majong:': 1,
+               'Majong': 1,
                'Dog': 0}
 
 class Card():
@@ -49,16 +49,17 @@ class Card():
         	self.points = -25
 
         # card image is used for visualization
+        # TODO: printing it is not nice (yet)
         if name == '10':
             self.image = ['┌┄┄┄┑', '┆'+self.name+' ┆', '┆ '+SUITS[self.suit]+' ┆', '┆ '+self.name+'┆', '┕┄┄┄┙']
         elif name == 'Dragon':
-        	self.image = ['┌┄┄┄┑', '┆'+'Dr'+' ┆', '┆ '+' '+' ┆', '┆ '+self.name+'┆', '┕┄┄┄┙']
+        	self.image = ['┌┄┄┄┑', '┆ '+'Dr'+' ┆', '┆ '+'ag'+' ┆', '┆ '+'on'+' ┆', '┕┄┄┄┙']
         elif name == 'Phoenix':
-            self.image = ['┌┄┄┄┑', '┆'+'Ph'+' ┆', '┆ '+' '+' ┆', '┆ '+self.name+'┆', '┕┄┄┄┙']
+            self.image = ['┌┄┄┄┑', '┆ '+'Ph'+' ┆', '┆ '+'oe'+' ┆', '┆ '+'nix'+'┆', '┕┄┄┄┙']
         elif name == 'Dog': 
-            self.image = ['┌┄┄┄┑', '┆'+'Dg'+' ┆', '┆ '+' '+' ┆', '┆ '+self.name+'┆', '┕┄┄┄┙']
+            self.image = ['┌┄┄┄┑', '┆'+' '+' ┆', '┆ '+'Dog'+'┆', '┆ '+' '+'┆', '┕┄┄┄┙']
         elif name == 'Majong':   
-            self.image = ['┌┄┄┄┑', '┆'+'1'+'  ┆', '┆ '+' '+' ┆', '┆  '+self.name+'┆', '┕┄┄┄┙']
+            self.image = ['┌┄┄┄┑', '┆'+' '+'  ┆', '┆ '+'1'+' ┆', '┆  '+' '+'┆', '┕┄┄┄┙']
         else:
             self.image = ['┌┄┄┄┑', '┆'+self.name+'  ┆', '┆ '+SUITS[self.suit]+' ┆', '┆  '+self.name+'┆', '┕┄┄┄┙']
 
@@ -90,8 +91,4 @@ class Card():
         card_hash = card_hash.hexdigest()
         card_hash = int(card_hash, 16)
         return card_hash
-
-    def set_power(self, power):
-        if self.name != 'Phoenix':
-            raise ValueError('Could not set power of a card other than Phoenix')
-        self.power = power    
+  

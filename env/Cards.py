@@ -25,7 +25,7 @@ class Cards():
                 self.phoenix_flag = True
         self.cards.sort()
 
-        self.size = len(cards)
+        self.size = len(self.cards)
 
         self.set_type_and_power()
 
@@ -39,14 +39,15 @@ class Cards():
                     print(self.cards[crd].image[i], end='')
                 print()	
 
-    # get number of game points of this card set
-    def get_points(self):
-        return sum([card.points for crd in self.cards])
+    # set number of game points of this card set
+    def set_points(self):
+        self.points = sum([crd.points for crd in self.cards])
 
     # determine which combination (if any) is this card set
     def set_type_and_power(self):
         card_set = self.cards
         card_set.sort()
+        self.type = 'unk'
 
         # pass
         if len(card_set)==0:
@@ -134,6 +135,8 @@ class Cards():
             # phoneix straight
             if self.phoenix_flag:
                 phoenix_used = False
+                phoenix_idx = -1
+                is_straight = True
                 for i in range(len(card_set)-2):
                     if card_set[i+1].power + 1 == card_set[i+2].power:
                         pass
@@ -141,13 +144,14 @@ class Cards():
                         phoenix_used = True
                         phoenix_idx = i+1
                     else:
-                        break
-                self.type = 'straight'
-                if phoenix_idx == len(card_set): # phoenix is last card of straight
-                    self.power = card_set[-1].power+1
-                else:
-                    self.power = card_set[-1].power
-                return
+                        is_straight = False
+                if is_straight:
+                    self.type = 'straight'
+                    if phoenix_idx == len(card_set): # phoenix is last card of straight
+                        self.power = card_set[-1].power+1
+                    else:
+                        self.power = card_set[-1].power
+                    return
         # pair sequence
         if len(card_set) >= 4 and len(card_set) % 2 == 0:
             is_pair_seq = True
@@ -160,7 +164,8 @@ class Cards():
                     is_pair_seq = False
                     break
             # phoenix pair sequence
-            if phoenix_flag:
+            # TODO: Does not work yet
+            if self.phoenix_flag:
                 phoenix_used = False
                 for i in range(len(card_set)-2):
                     if i % 2 == 0 and card_set[i+1].power == card_set[i+2].power:
@@ -176,8 +181,8 @@ class Cards():
                 self.type = 'pair_seq'
                 self.power = card_set[-1].power
                 return
-        # hand
-        else:
+        # no combination must be a hand
+        if self.type == 'unk':
             self.type = 'hand'
             self.power = 0
 
