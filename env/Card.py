@@ -62,13 +62,6 @@ class Card():
         else:
             self.image = ['┌┄┄┄┑', '┆'+self.name+'  ┆', '┆ '+SUITS[self.suit]+' ┆', '┆  '+self.name+'┆', '┕┄┄┄┙']
 
-        self._assert_valid()
-
-    
-    def _assert_valid(self):
-        if not self.special_card:
-            assert self.suit in suits
-        assert CARD_VALUES[self.name] == self.power
 
     def __ge__(self, other):
         return self.power >= other.power
