@@ -37,7 +37,7 @@ class Cards():
             for i in range(5):
                 for crd in range(self.size):
                     print(self.cards[crd].image[i], end='')
-                print()	
+                print()    
 
     # set number of game points of this card set
     def set_points(self):
@@ -47,6 +47,7 @@ class Cards():
     def set_type_and_power(self):
         card_set = self.cards
         card_set.sort()
+        phoenix_flag = self.phoenix_flag
         self.type = 'unk'
 
         # pass
@@ -66,7 +67,7 @@ class Cards():
                 self.power = card_set[0].power
                 return
             # phoenix pair
-            elif self.phoenix_flag:
+            elif phoenix_flag:
                 self.type = 'pair'
                 self.power = card_set[1].power
                 return
@@ -77,7 +78,7 @@ class Cards():
                 self.power = card_set[0].power
                 return
             # phoenix triple
-            elif self.phoenix_flag and card_set[1].power == card_set[2].power:
+            elif phoenix_flag and card_set[1].power == card_set[2].power:
                 self.type = 'triple'
                 self.power = card_set[1].power
                 return
@@ -97,12 +98,12 @@ class Cards():
                 self.power = card_set[2].power
                 return
             # phoenix full house with phoenix triple
-            elif self.phoenix_flag and card_set[1].power == card_set[2].power and card_set[3].power == card_set[4].power:
+            elif phoenix_flag and card_set[1].power == card_set[2].power and card_set[3].power == card_set[4].power:
                 self.type = 'full'
                 self.power = card_set[3].power
                 return
             # phoenix full house with phoenix pair
-            elif self.phoenix_flag:
+            elif phoenix_flag:
                 if card_set[1].power == card_set[2].power and card_set[2].power == card_set[3].power:
                     self.type = 'full'
                     self.power = card_set[1].power
@@ -133,7 +134,7 @@ class Cards():
                 self.power = card_set[-1].power
                 return
             # phoneix straight
-            if self.phoenix_flag:
+            if phoenix_flag:
                 phoenix_used = False
                 phoenix_idx = -1
                 is_straight = True
@@ -153,34 +154,67 @@ class Cards():
                         self.power = card_set[-1].power
                     return
         # pair sequence
-        if len(card_set) >= 4 and len(card_set) % 2 == 0:
-            is_pair_seq = True
+        if len(card_set) >= 4 and len(card_set) % 2 == 0 and not(any((crd.name == 'Dog' or crd.name == 'Dragon') for crd in card_set)):
+            is_pair_regular = True
             for i in range(len(card_set)-1):
                 if i % 2 == 0 and card_set[i].power == card_set[i+1].power:
                     pass
                 elif i % 2 == 1 and card_set[i].power + 1 == card_set[i+1].power:
                     pass
                 else:
-                    is_pair_seq = False
+                    is_pair_regular = False
                     break
-            # phoenix pair sequence
-            # TODO: Does not work yet
-            if self.phoenix_flag:
-                phoenix_used = False
-                for i in range(len(card_set)-2):
-                    if i % 2 == 0 and card_set[i+1].power == card_set[i+2].power:
-                        pass
-                    elif i % 2 == 1 and card_set[i+1].power + 1 == card_set[i+2].power:
-                        pass
-                    elif phoenix_used:
-                        is_pair_seq = False
-                        break
-                    else:
-                        phoenix_used = True
-            if is_pair_seq == True:
+            if is_pair_regular:
                 self.type = 'pair_seq'
                 self.power = card_set[-1].power
-                return
+                return  
+            # phoenix pair sequence (quite complicated to get all valid cases)
+            if phoenix_flag:
+                # first, check if it is an increasing by +1 sequence
+                unique_power = sorted(set([crd.power for crd in card_set]))
+                unique_power.pop(0) # remove phoenix
+                if all(x+1==y for x, y in zip(unique_power, unique_power[1:])) and len(unique_power)>1:
+                    phoenix_used = False
+                    is_pair_equal = True
+                    is_pair_unequal = True
+                    # check for phoenix use in 'unequal' index
+                    toggle = 1
+                    antitoggle = 0
+                    for i in range(1,len(card_set)-1):
+                        if i % 2 == toggle and card_set[i].power == card_set[i+1].power:
+                            pass
+                        elif i % 2 == antitoggle and card_set[i].power + 1 == card_set[i+1].power:
+                            if i+1 >= len(card_set)-1 and not(phoenix_used):
+                                # phoenix is used as the highest pair of sequence
+                                phoenix_used = True
+                        elif phoenix_used: # phoenix cannot be used twice
+                            is_pair_unequal = False
+                            break
+                        else:
+                            # phoenix is used in the middle of the sequence 
+                            # -> set consequence of i % 2 accordingly by toggling 1 and 0
+                            phoenix_used = True
+                            toggle = 0
+                            antitoggle = 1
+                    # check for phoenix use in 'equal' index (only if unequal is False)
+                    if not(is_pair_unequal):
+                        phoenix_used = False
+                        for i in range(1,len(card_set)-1):
+                            if i % 2 == 0 and card_set[i].power == card_set[i+1].power:
+                                pass
+                            elif i % 2 == 1 and card_set[i].power + 1 == card_set[i+1].power:
+                                # check if phoenix is used as first card of the sequence
+                                if i == 1:
+                                    phoenix_used = True
+                            elif phoenix_used: # phoenix cannot be used twice
+                                is_pair_equal = False
+                                break
+                            else:
+                                phoenix_used = True            
+                    if is_pair_unequal or is_pair_equal:
+                        self.type = 'pair_seq'
+                        self.power = card_set[-1].power
+                        return
         # no combination must be a hand
         if self.type == 'unk':
             self.type = 'hand'
