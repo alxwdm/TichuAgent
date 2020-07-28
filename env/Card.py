@@ -49,19 +49,18 @@ class Card():
         	self.points = -25
 
         # card image is used for visualization
-        # TODO: printing it is not nice (yet)
         if name == '10':
-            self.image = ['┌┄┄┄┑', '┆'+self.name+' ┆', '┆ '+SUITS[self.suit]+' ┆', '┆ '+self.name+'┆', '┕┄┄┄┙']
+            self.image = ['┍┄┄┄┑', '┆'+self.name+'   ┆', '┆  '+SUITS[self.suit]+'  ┆', '┆   '+self.name+'┆', '┖┄┄┄┚']
         elif name == 'Dragon':
-        	self.image = ['┌┄┄┄┑', '┆ '+'Dr'+' ┆', '┆ '+'ag'+' ┆', '┆ '+'on'+' ┆', '┕┄┄┄┙']
+        	self.image = ['┍┄┄┄┑', '┆ '+'Dr'+'  ┆', '┆ '+'ag'+'  ┆', '┆ '+'on'+'  ┆', '┖┄┄┄┚']
         elif name == 'Phoenix':
-            self.image = ['┌┄┄┄┑', '┆ '+'Ph'+' ┆', '┆ '+'oe'+' ┆', '┆ '+'nix'+'┆', '┕┄┄┄┙']
+            self.image = ['┍┄┄┄┑', '┆ '+'Ph'+'  ┆', '┆ '+'oe'+'  ┆', '┆ '+'nix'+' ┆', '┖┄┄┄┚']
         elif name == 'Dog': 
-            self.image = ['┌┄┄┄┑', '┆'+' '+' ┆', '┆ '+'Dog'+'┆', '┆ '+' '+'┆', '┕┄┄┄┙']
+            self.image = ['┍┄┄┄┑', '┆'+' '+'  ┆', '┆ '+'Dog'+'┆', ' ┆ '+' '+' ┆', '┖┄┄┄┚']
         elif name == 'Majong':   
-            self.image = ['┌┄┄┄┑', '┆'+' '+'  ┆', '┆ '+'1'+' ┆', '┆  '+' '+'┆', '┕┄┄┄┙']
+            self.image = ['┍┄┄┄┑', '┆'+' '+'  ┆', ' ┆ '+'1'+' ┆', ' ┆  '+' '+' ┆', '┖┄┄┄┚']
         else:
-            self.image = ['┌┄┄┄┑', '┆'+self.name+'  ┆', '┆ '+SUITS[self.suit]+' ┆', '┆  '+self.name+'┆', '┕┄┄┄┙']
+            self.image = ['┍┄┄┄┑', '┆ '+self.name+'   ┆', '┆  '+SUITS[self.suit]+'  ┆', '┆   '+self.name+' ┆', '┖┄┄┄┚']
 
 
     def __ge__(self, other):
