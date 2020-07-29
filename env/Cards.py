@@ -227,9 +227,26 @@ class Cards():
         # TODO
         return
 
-    def drop(self, other, inplace=True):
-        # TODO
-        return
+    def remove(self, card):
+        self.cards.remove(card)
+        self.cards.sort()
+        if card.name == 'Phoenix':
+        	self.phoenix_flag = False
+        self.size = self.size - 1
+        self.set_type_and_power()
+
+    def __add__(self, card_list_to_add):
+        this_card_list = self.cards
+        this_card_list.append(card_list_to_add)
+        new_cards = Cards(card_list=this_card_list)
+        return new_cards
+
+    def __sub__(self, cards):
+    	this_card_list = self.cards
+        for crd in cards:
+            this_card_list.remove(crd)
+        new_cards = Cards(card_list=this_card_list)
+        return new_cards
 
     def __ge__(self, other):
         # equal types or bombs, compare power
@@ -272,5 +289,5 @@ class Cards():
     def __repr__(self):
         return str({'type': self.type,
                     'size': self.size,
-                    'cards': [crd.name, crd.suit for crd in self.cards])
+                    'cards': [crd.name, crd.suit for crd in self.cards]})
        
