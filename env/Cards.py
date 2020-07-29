@@ -8,6 +8,8 @@ from collections import defaultdict
 
 from env.Card import Card
 
+BOMBS = ['four_bomb', 'straight_bomb']
+
 class Cards():
 
     size = None
@@ -85,7 +87,7 @@ class Cards():
         # four (BOMB)
         if len(card_set)==4 and card_set[0].power == card_set[1].power and card_set[1].power == card_set[2].power and card_set[2].power == card_set[3].power:
             self.type = 'four_bomb'
-            self.power = card_set[0].power
+            self.power = 50 + card_set[0].power
             return
         # full house 
         if len(card_set)==5:
@@ -127,7 +129,7 @@ class Cards():
                     break
             if is_straight == True and is_flush == True:
                 self.type = 'straight_bomb'
-                self.power = card_set[0].power
+                self.power = 100 + card_set[-1].power
                 return
             if is_straight:
                 self.type = 'straight'
@@ -224,4 +226,46 @@ class Cards():
     def get_available_combinations(self):
         # TODO
         return
+
+    def drop(self, other, inplace=True):
+        # TODO
+        return
+
+    def __ge__(self, other):
+        # equal types or bombs, compare power
+        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS: 
+            return self.power >= other.power
+        # unequal types, return False (opt: raise error)
+        else: 
+            return False
+
+    def __le__(self, other):
+        # equal types or bombs, compare power
+        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS:
+            return self.power <= other.power
+        # unequal types, return False (opt: raise error)
+        else: 
+            return False
+
+    def __gt__(self, other):
+        # equal types or bombs, compare power
+        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS:
+            return self.power > other.power
+        # unequal types, return False (opt: raise error)
+        else: 
+            return False
+
+    def __lt__(self, other):
+        # equal types or bombs, compare power
+        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS:
+            return self.power < other.power
+        # unequal types, return False (opt: raise error)
+        else: 
+            return False
+
+    def __eq__(self, other):
+        return self.type == other.type and self.size == other.size and self.power == other.power
+
+    def __ne__(self, other):
+        return self.type != other.type and self.size != other.size and self.power != other.power
        
