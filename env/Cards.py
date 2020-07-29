@@ -268,4 +268,9 @@ class Cards():
 
     def __ne__(self, other):
         return self.type != other.type and self.size != other.size and self.power != other.power
+
+    def __repr__(self):
+        return str({'type': self.type,
+                    'size': self.size,
+                    'cards': [crd.name, crd.suit for crd in self.cards])
        

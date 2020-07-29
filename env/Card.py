@@ -90,4 +90,10 @@ class Card():
         card_hash = card_hash.hexdigest()
         card_hash = int(card_hash, 16)
         return card_hash
+
+    def __repr__(self):
+        return str({'name': self.name,
+                    'suit': self.suit,
+                    'power': self.power,
+                    'points': self.points})
   
