@@ -29,7 +29,8 @@ class Cards():
 
         self.size = len(self.cards)
 
-        self.set_type_and_power()
+        self._set_type_and_power()
+        self._set_points()
 
     # a nice visualization of all cards in the set
     def show(self):
@@ -42,11 +43,14 @@ class Cards():
                 print()    
 
     # set number of game points of this card set
-    def set_points(self):
-        self.points = sum([crd.points for crd in self.cards])
+    def _set_points(self):
+        if self.type != 'pass':
+            self.points = sum([crd.points for crd in self.cards])
+        else:
+            self.points = 0
 
     # determine which combination (if any) is this card set
-    def set_type_and_power(self):
+    def _set_type_and_power(self):
         card_set = self.cards
         card_set.sort()
         phoenix_flag = self.phoenix_flag
@@ -231,9 +235,10 @@ class Cards():
         self.cards.remove(card)
         self.cards.sort()
         if card.name == 'Phoenix':
-        	self.phoenix_flag = False
+            self.phoenix_flag = False
         self.size = self.size - 1
-        self.set_type_and_power()
+        self._set_type_and_power()
+        self._set_points()
 
     def __add__(self, card_list_to_add):
         this_card_list = self.cards
@@ -242,7 +247,7 @@ class Cards():
         return new_cards
 
     def __sub__(self, cards):
-    	this_card_list = self.cards
+        this_card_list = self.cards
         for crd in cards:
             this_card_list.remove(crd)
         new_cards = Cards(card_list=this_card_list)
@@ -290,4 +295,3 @@ class Cards():
         return str({'type': self.type,
                     'size': self.size,
                     'cards': [crd.name, crd.suit for crd in self.cards]})
-       
