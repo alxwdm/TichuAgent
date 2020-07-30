@@ -232,6 +232,7 @@ class Cards():
         return
 
     def remove(self, card):
+        # TODO check if card to be removed is in cards
         self.cards.remove(card)
         self.cards.sort()
         if card.name == 'Phoenix':
