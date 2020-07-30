@@ -23,7 +23,7 @@ CARD_VALUES = {'2': 2,
                'Q': 12,
                'K': 13,
                'A': 14,
-               'Dragon': 15,
+               'Dragon': 15.1,
                'Phoenix': 0.5,
                'Majong': 1,
                'Dog': 0}
