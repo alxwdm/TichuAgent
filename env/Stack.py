@@ -16,13 +16,13 @@ class Stack():
         self.dragon_flag = False
 
     def _set_power(self):
-        self.power = self.card_list[-1].power
+        self.power = self.cards_list[-1].power
 
     def _set_points(self):
         self.points = sum(crds.points for crds in self.cards_list)
 
     def _set_type(self):
-        self.type = self.card_list[-1].type
+        self.type = self.cards_list[-1].type
 
     def _set_dragon_flag(self):
         name_list = [crd.name for crds in self.cards_list for crd in crds.cards]
@@ -37,7 +37,7 @@ class Stack():
 
     def add(self, cards_to_add):
         # add cards to stack according to game rules
-        if not self.cards_list:
+        if not self.cards_list and cards_to_add != 'hand':
             self.cards_list.append(cards_to_add)
             self._update()
             return True
