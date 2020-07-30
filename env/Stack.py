@@ -37,7 +37,7 @@ class Stack():
 
     def add(self, cards_to_add):
         # add cards to stack according to game rules
-        if not self.cards_list and cards_to_add != 'hand':
+        if not self.cards_list and cards_to_add.type != 'hand':
             self.cards_list.append(cards_to_add)
             self._update()
             return True
