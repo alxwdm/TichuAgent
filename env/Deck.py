@@ -102,6 +102,6 @@ class Deck():
         set_0 = Cards(card_list=all_cards[0:chunk_size])
         set_1 = Cards(card_list=all_cards[chunk_size:2*chunk_size])
         set_2 = Cards(card_list=all_cards[2*chunk_size:3*chunk_size])
-        set_3 = Cards(card_list=all_cards[3*chunk_size:-1])
+        set_3 = Cards(card_list=all_cards[3*chunk_size:])
         return set_0, set_1, set_2, set_3
        
