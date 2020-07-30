@@ -73,7 +73,7 @@ class Cards():
                 self.power = card_set[0].power
                 return
             # phoenix pair
-            elif phoenix_flag:
+            elif phoenix_flag and not (card_set[1].name == 'Dragon'):
                 self.type = 'pair'
                 self.power = card_set[1].power
                 return
