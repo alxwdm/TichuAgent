@@ -232,14 +232,17 @@ class Cards():
         return
 
     def remove(self, card):
-        # TODO check if card to be removed is in cards
-        self.cards.remove(card)
+        try:
+            self.cards.remove(card)
+        except: # if card is not in cards, return False
+            return False
         self.cards.sort()
         if card.name == 'Phoenix':
             self.phoenix_flag = False
         self.size = self.size - 1
         self._set_type_and_power()
         self._set_points()
+        return True
 
     def __add__(self, card_list_to_add):
         this_card_list = self.cards
