@@ -44,6 +44,12 @@ class Stack():
             self.cards_list.append(cards_to_add)
             self._update()
             return True
+        elif self.type == 'solo' and cards_to_add.type == 'Phoenix' and self.power < 15:
+            old_power = self.power
+            self.cards_list.append(cards_to_add)
+            self._update()
+            self.power = old_power + 0.5           
+            return True   
         elif cards_to_add.type in BOMBS and self.power < cards_to_add.power:
             self.cards_list.append(cards_to_add)
             self._update()      
