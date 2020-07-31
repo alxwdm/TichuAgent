@@ -231,8 +231,10 @@ class Cards():
         # TODO
         return # list of cards
 
-    def contains(self, cards):
-        return all(crd in self.cards for crd in cards)
+    def contains(self, other):
+        this_cards = [(crd.name, crd.suit) for crd in self.cards]
+        other_cards = [(crd.name, crd.suit) for crd in other.cards]
+        return all([elem in this_cards for elem in other_cards])
 
     def remove(self, card):
         try:
