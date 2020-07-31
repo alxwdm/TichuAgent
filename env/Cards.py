@@ -229,7 +229,10 @@ class Cards():
     # get all available combinations from this card set
     def get_available_combinations(self):
         # TODO
-        return
+        return # list of cards
+
+    def contains(self, cards):
+        return all(crd in self.cards for crd in cards)
 
     def remove(self, card):
         try:

@@ -6,7 +6,6 @@ BOMBS = ['four_bomb', 'straight_bomb']
 
 class Stack():
 
-
     def __init__(self):
         
         self.cards_list = list()
