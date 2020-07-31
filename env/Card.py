@@ -26,7 +26,7 @@ CARD_VALUES = {'2': 2,
                'Dragon': 15.1,
                'Phoenix': 0.5,
                'Majong': 1,
-               'Dog': 0}
+               'Dog': 0.9}
 
 class Card():
 
