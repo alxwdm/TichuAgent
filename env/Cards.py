@@ -248,30 +248,31 @@ class Cards():
             if solo_cards.type == 'solo':
                 solo.append(solo_cards)
         # pair
+        # TODO: Does not work yet!
         for i in range(len(self.cards)-1):
             # regular pairs
             if all_cards[i].power == all_cards[i+1].power:
                 pair_list = [all_cards[i], all_cards[i+1]]
-                pair_cards = Cards([pair_list])
-                if pair_cards.type == 'pair'
+                pair_cards = Cards(pair_list)
+                if pair_cards.type == 'pair':
                     pair.append(pair_cards)         
             # phoenix pairs
             if phoenix_flag and all_cards[i+1].suit != 'Special':
                 pair_list = [all_cards[0], all_cards[i+1]]
-                pair_cards = Cards([pair_list])
-                if pair_cards.type == 'pair'
+                pair_cards = Cards(pair_list)
+                if pair_cards.type == 'pair':
                     pair.append(pair_cards)    
             # multiple pairs
             try:
                 if all_cards[i].power == all_cards[i+2].power:
                     pair_list = [all_cards[i], all_cards[i+2]]
-                    pair_cards = Cards([pair_list])
-                    if pair_cards.type == 'pair'
+                    pair_cards = Cards(pair_list)
+                    if pair_cards.type == 'pair':
                         pair.append(pair_cards)      
                 if all_cards[i].power == all_cards[i+3].power:
                     pair_list = [all_cards[i], all_cards[i+3]]
-                    pair_cards = Cards([pair_list])
-                    if pair_cards.type == 'pair'
+                    pair_cards = Cards(pair_list)
+                    if pair_cards.type == 'pair':
                         pair.append(pair_cards)    
             except:
                 pass  
@@ -280,44 +281,44 @@ class Cards():
             # regular triple
             if all_cards[i].power == all_cards[i+1].power and all_cards[i+1].power == all_cards[i+2].power:
                 triple_list = [all_cards[i], all_cards[i+1], all_cards[i+2]]
-                triple_cards = Cards([triple_list])
+                triple_cards = Cards(triple_list)
                 if triple_cards.type == 'triple':
                     triple.append(triple_cards)
             # phoenix triple
             if phoenix_flag and all_cards[i+1].power == all_cards[i+2].power:
                 triple_list = [all_cards[0], all_cards[i+1], all_cards[i+2]]
-                triple_cards = Cards([triple_list])
+                triple_cards = Cards(triple_list)
                 if triple_cards.type == 'triple':
                     triple.append(triple_cards)
             # multiple triples
             try:
                 if all_cards[i].power == all_cards[i+1].power and all_cards[i+1].power == all_cards[i+3].power:
                     triple_list = [all_cards[i], all_cards[i+1], all_cards[i+3]]
-                    triple_cards = Cards([triple_list])
+                    triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
                 if all_cards[i].power == all_cards[i+2].power and all_cards[i+2].power == all_cards[i+3].power:
                     triple_list = [all_cards[i], all_cards[i+2], all_cards[i+3]]
-                    triple_cards = Cards([triple_list])
+                    triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
                 if phoenix_flag and all_cards[i+1].power == all_cards[i+3].power:
                     triple_list = [all_cards[0], all_cards[i+1], all_cards[i+3]]
-                    triple_cards = Cards([triple_list])
+                    triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
                 if phoenix_flag and all_cards[i+1].power == all_cards[i+4].power:
                     triple_list = [all_cards[0], all_cards[i+1], all_cards[i+4]]
-                    triple_cards = Cards([triple_list])
+                    triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
             except:
                 pass
         # four
         for i in range(len(self.cards)-3):
-            if if all_cards[i].power == all_cards[i+1].power and all_cards[i+1].power == all_cards[i+2].power and all_cards[i+2].power == all_cards[i+3].power:
+            if all_cards[i].power == all_cards[i+1].power and all_cards[i+1].power == all_cards[i+2].power and all_cards[i+2].power == all_cards[i+3].power:
                 four_list = [all_cards[i], all_cards[i+1], all_cards[i+2], all_cards[i+3]]
-                four_cards = Cards([four_list])
+                four_cards = Cards(four_list)
                 if four_cards.type == 'four_bomb':
                     four_bomb.append(four_cards)
         # full house
@@ -326,7 +327,7 @@ class Cards():
                 if i.power != j.power:
                     full_list = i.cards
                     full_list.extend(j.cards)
-                    full_cards = Cards([full_list])
+                    full_cards = Cards(full_list)
                     if full_cards.type == 'full':
                         full.append(full_cards)
         # straight and straight_bomb
@@ -340,10 +341,10 @@ class Cards():
                     if all_cards[j].name == 'Phoenix':
                         phoenix_available = False
                 # no check if Phoenix is last entry
-                elif candidate_list[-1].type == 'Phoenix':
+                elif candidate_list[-1].name == 'Phoenix':
                     candidate_list.append(all_cards[j])
                     if len(candidate_list) > 4:
-                        straight_cards = Cards([candidate_list])
+                        straight_cards = Cards(candidate_list)
                         if straight_cards.type == 'straight':
                             straight.append(straight_cards)
                         else:
@@ -352,7 +353,7 @@ class Cards():
                 elif candidate_list[-1].power+1 == all_cards[j].power:
                     candidate_list.append(all_cards[j])
                     if len(candidate_list) > 4:
-                        straight_cards = Cards([candidate_list])
+                        straight_cards = Cards(candidate_list)
                         if straight_cards.type == 'straight':
                             straight.append(straight_cards)
                         elif straight_cards.type == 'straight_bomb':
@@ -366,7 +367,7 @@ class Cards():
                 elif phoenix_available:
                     candidate_list.append(all_cards[0])
                     if len(candidate_list) > 4:
-                        straight_cards = Cards([candidate_list])
+                        straight_cards = Cards(candidate_list)
                         if straight_cards.type == 'straight':
                             straight.append(straight_cards)
                     phoenix_available = False
@@ -379,12 +380,12 @@ class Cards():
             for j in range(i,len(pair)):
                 # add first element to candidate list
                 if len(candidate_list) == 0:
-                    candidate_list.append(pair[j])
+                    candidate_list.extend([elem for elem in pair[j].cards])
                 # add subsequent pairs
                 elif candidate_list[-1].power+1 == all_cards[j].power:
-                    candidate_list.append(pair[j])
+                    candidate_list.extend([elem for elem in pair[j].cards])
                     if len(candidate_list) > 1:
-                        pair_seq_cards = Cards([candidate_list])
+                        pair_seq_cards = Cards(candidate_list)
                         if pair_seq_cards.type == 'pair_seq':
                             pair_seq.append(pair_seq_cards)
                 # skip double pairs
