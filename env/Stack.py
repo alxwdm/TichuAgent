@@ -44,7 +44,7 @@ class Stack():
             self.cards_list.append(cards_to_add)
             self._update()
             return True
-        elif self.type == 'solo' and cards_to_add.type == 'Phoenix' and self.power < 15:
+        elif self.type == 'solo' and cards_to_add.name == 'Phoenix' and self.power < 15:
             old_power = self.power
             self.cards_list.append(cards_to_add)
             self._update()
@@ -56,3 +56,17 @@ class Stack():
             return True
         else: # illegal move
             return False 
+
+    # check if new_cards is a valid move on old_cards
+    @staticmethod
+    def check_valid_move(old_cards, new_cards):
+        if not(old_cards) and new_cards.type != 'hand':
+            return True
+        elif old_cards.type == new_cards.type and old_cards.power < new_cards.power:
+            return True
+        elif old_cards.type == 'solo' and new_cards.name == 'Phoenix' and old_cards.power < 15:
+            return True 
+        elif new_cards.type in BOMBS and old_cards.power < new_cards.power:
+            return True
+        else:
+            return False
