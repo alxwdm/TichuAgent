@@ -233,7 +233,7 @@ class Cards():
         phoenix_flag = self.phoenix_flag
 
         solo = list()
-        pair = list()
+        pair_comb = list()
         triple = list()
         four_bomb = list()
         full = list()
@@ -250,30 +250,33 @@ class Cards():
         # pair
         # TODO: Does not work yet!
         for i in range(len(self.cards)-1):
+        	# reset
+        	pair_list = None
+        	pair_cards = None
             # regular pairs
             if all_cards[i].power == all_cards[i+1].power:
                 pair_list = [all_cards[i], all_cards[i+1]]
                 pair_cards = Cards(pair_list)
                 if pair_cards.type == 'pair':
-                    pair.append(pair_cards)         
+                    pair_comb.append(pair_cards)         
             # phoenix pairs
             if phoenix_flag and all_cards[i+1].suit != 'Special':
                 pair_list = [all_cards[0], all_cards[i+1]]
                 pair_cards = Cards(pair_list)
                 if pair_cards.type == 'pair':
-                    pair.append(pair_cards)    
+                    pair_comb.append(pair_cards)    
             # multiple pairs
             try:
                 if all_cards[i].power == all_cards[i+2].power:
                     pair_list = [all_cards[i], all_cards[i+2]]
                     pair_cards = Cards(pair_list)
                     if pair_cards.type == 'pair':
-                        pair.append(pair_cards)      
+                        pair_comb.append(pair_cards)      
                 if all_cards[i].power == all_cards[i+3].power:
                     pair_list = [all_cards[i], all_cards[i+3]]
                     pair_cards = Cards(pair_list)
                     if pair_cards.type == 'pair':
-                        pair.append(pair_cards)    
+                        pair_comb.append(pair_cards)    
             except:
                 pass  
         # triple
@@ -377,13 +380,13 @@ class Cards():
         # pair_seq
         for i in range(len(pair)-1):
             candidate_list = list()
-            for j in range(i,len(pair)):
+            for j in range(i,len(pair_comb)):
                 # add first element to candidate list
                 if len(candidate_list) == 0:
-                    candidate_list.extend([elem for elem in pair[j].cards])
+                    candidate_list.extend([elem for elem in pair_comb[j].cards])
                 # add subsequent pairs
                 elif candidate_list[-1].power+1 == all_cards[j].power:
-                    candidate_list.extend([elem for elem in pair[j].cards])
+                    candidate_list.extend([elem for elem in pair_comb[j].cards])
                     if len(candidate_list) > 1:
                         pair_seq_cards = Cards(candidate_list)
                         if pair_seq_cards.type == 'pair_seq':
@@ -394,7 +397,7 @@ class Cards():
                 # break if no pair_seq possible
                 else:
                     break
-        return [solo, pair, triple, four_bomb, full, straight, straight_bomb, pair_seq]
+        return [solo, pair_comb, triple, four_bomb, full, straight, straight_bomb, pair_seq]
 
 
     # check if this Cards obj contains all cards from other Cards obj
