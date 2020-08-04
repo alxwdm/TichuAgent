@@ -45,7 +45,7 @@ class Stack():
                 self.cards_list.append(cards_to_add)
                 self._update()
                 return True
-             else:
+            else:
                  return False
         elif self.type == 'solo' and cards_to_add.phoenix_flag and self.power < 15:
             old_power = self.power
