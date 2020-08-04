@@ -250,9 +250,9 @@ class Cards():
         # pair
         # TODO: Does not work yet!
         for i in range(len(self.cards)-1):
-        	# reset
-        	pair_list = None
-        	pair_cards = None
+            # reset
+            pair_list = None
+            pair_cards = None
             # regular pairs
             if all_cards[i].power == all_cards[i+1].power:
                 pair_list = [all_cards[i], all_cards[i+1]]
