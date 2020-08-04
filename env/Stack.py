@@ -41,12 +41,12 @@ class Stack():
             self._update()
             return True
         elif self.type == cards_to_add.type and self.power < cards_to_add.power:
-            if self.type == 'straight' and len(self.cards) == len(cards_to_add.cards):
+            if self.type == 'straight' and not(len(self.cards) == len(cards_to_add.cards)):
+                return False
+            else:
                 self.cards_list.append(cards_to_add)
                 self._update()
                 return True
-            else:
-                 return False
         elif self.type == 'solo' and cards_to_add.phoenix_flag and self.power < 15:
             old_power = self.power
             self.cards_list.append(cards_to_add)
@@ -66,10 +66,10 @@ class Stack():
         if not(old_cards) and new_cards.type != 'hand':
             return True
         elif old_cards.type == new_cards.type and old_cards.power < new_cards.power:
-            if self.type == 'straight' and len(self.cards) == len(cards_to_add.cards):
-                return True
-            else:
+            if old_cards.type == 'straight' and not(len(old_cards.cards) == len(new_cards.cards)):
                 return False
+            else:
+                return True
         elif old_cards.type == 'solo' and new_cards.phoenix_flag and old_cards.power < 15:
             return True 
         elif new_cards.type in BOMBS and old_cards.power < new_cards.power:
