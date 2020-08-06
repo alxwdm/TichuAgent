@@ -168,10 +168,22 @@ class Game():
         # if either opponent has called tichu, give cards to other opponent
         if self.player[opponents[0]].tichu_flag:
             self.player[opponents[1]].add_points(self.stack.points)
+            if self.verbose > 0:
+                print('Player {0} gave dragon stack to player {1}'.format(
+                    self.leading_player, opponents[1]))
         elif self.player[opponents[1]].tichu_flag:
             self.player[opponents[0]].add_points(self.stack.points)
+            if self.verbose > 0:
+                print('Player {0} gave dragon stack to player {1}'.format(
+                    self.leading_player, opponents[0]))
         # if no tichu called by opposite team, give dragon to player with more hand cards
         elif self.player[opponents[0]].hand_size < self.player[opponents[1]].hand_size:
             self.player[opponents[1]].add_points(self.stack.points)
+            if self.verbose > 0:
+                print('Player {0} gave dragon stack to player {1}'.format(
+                    self.leading_player, opponents[1]))
         else:
             self.player[opponents[0]].add_points(self.stack.points)
+            if self.verbose > 0:
+                print('Player {0} gave dragon stack to player {1}'.format(
+                    self.leading_player, opponents[0]))
