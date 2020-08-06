@@ -28,7 +28,10 @@ class Game():
         self.stack = Stack()
 
         # Game managing parameter
-        self.active_player = random.randint(0,3)
+        for i in range(4):
+        	for crd in self.players[i].hand.cards:
+        		if crd.name == 'Majong':
+        			self.active_player = i # Player with Majong starts
         self.leading_player = None
         self.players_finished = list()
         self.pass_counter = 0
