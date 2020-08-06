@@ -59,7 +59,7 @@ class Game():
                 self.pass_counter = 0
             # stack not finished, next players turn
             else:
-                self.active_player += 1 # TODO modulo
+                self.active_player = (player_id+1)%2
             return True
         # active player plays cards
         else:
@@ -68,8 +68,14 @@ class Game():
             # try to add cards to current stack
             suc2 = self.stack.add(cards)
             if suc1 and suc2:
-                self.leading_player = player_id
-                self.active_player += 1 # TODO modulo
+            	if cards.cards[0].name == 'Dog':
+            		teammate = self._get_teammate(player_id)
+            		self.active_player = teammate
+            		self.leading_player = teammate
+            		self.stack = Stack()
+            	else:
+	                self.leading_player = player_id
+	                self.active_player = (player_id+1)%2 
                 suc = self.player[player_id].remove_cards(cards)
                 if not(suc): # This should never happen
                     print('Could not remove players cards.')
