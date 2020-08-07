@@ -29,9 +29,9 @@ class Game():
 
         # Game managing parameter
         for i in range(4):
-        	for crd in self.players[i].hand.cards:
-        		if crd.name == 'Majong':
-        			self.active_player = i # Player with Majong starts
+            for crd in self.players[i].hand.cards:
+                if crd.name == 'Majong':
+                    self.active_player = i # Player with Majong starts
         self.leading_player = None
         self.players_finished = list()
         self.pass_counter = 0
@@ -71,14 +71,14 @@ class Game():
             # try to add cards to current stack
             suc2 = self.stack.add(cards)
             if suc1 and suc2:
-            	if cards.cards[0].name == 'Dog':
-            		teammate = self._get_teammate(player_id)
-            		self.active_player = teammate
-            		self.leading_player = teammate
-            		self.stack = Stack()
-            	else:
-	                self.leading_player = player_id
-	                self.active_player = (player_id+1)%2 
+                if cards.cards[0].name == 'Dog':
+                    teammate = self._get_teammate(player_id)
+                    self.active_player = teammate
+                    self.leading_player = teammate
+                    self.stack = Stack()
+                else:
+                    self.leading_player = player_id
+                    self.active_player = (player_id+1)%2 
                 suc = self.player[player_id].remove_cards(cards)
                 if not(suc): # This should never happen
                     print('Could not remove players cards.')
