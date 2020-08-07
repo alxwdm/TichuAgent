@@ -375,6 +375,7 @@ class Cards():
                 else:
                     break
         # pair_seq
+        # TODO: re-check this!
         for i in range(len(pair)-1):
             candidate_list = list()
             for j in range(i,len(pair)):
@@ -382,14 +383,14 @@ class Cards():
                 if len(candidate_list) == 0:
                     candidate_list.extend([elem for elem in pair[j].cards])
                 # add subsequent pairs
-                elif candidate_list[-1].power+1 == all_cards[j].power:
+                elif candidate_list[-1].power+1 == pair[j].power:
                     candidate_list.extend([elem for elem in pair[j].cards])
                     if len(candidate_list) > 1:
                         pair_seq_cards = Cards(candidate_list)
                         if pair_seq_cards.type == 'pair_seq':
                             pair_seq.append(pair_seq_cards)
                 # skip double pairs
-                elif candidate_list[-1].power == all_cards[j].power:
+                elif candidate_list[-1].power == pair[j].power:
                     pass
                 # break if no pair_seq possible
                 else:
