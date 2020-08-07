@@ -44,8 +44,9 @@ class Player():
     def random_move(self):
         # randomly play one available combination
         available_comb = self.hand.get_available_combinations()
-        random_comb = random.choice(available_comb)
-        suc = self.move(random_comb)
+        flattened = [item for sublist in available_comb for item in sublist]
+        random_comb = random.choice(flattened)
+        suc = self.move(random_comb) # just re-check, should always return True
         if suc:
             return random_comb
 
