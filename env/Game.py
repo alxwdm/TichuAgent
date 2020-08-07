@@ -153,14 +153,18 @@ class Game():
                 print('Player {0} hand is:'.format(i))
                 self.players[i].hand.show()            
 
-    def _get_opponents(self, pid=self.leading_player):
+    def _get_opponents(self, pid=None):
+        if not(pid):
+            pid = self.leading_player
         if pid%2 == 0:
             opps = [1, 3]
         else:
             opps = [0, 2]
         return opps
 
-    def _get_teammate(self, pid=self.leading_player):
+    def _get_teammate(self, pid=None):
+        if not(pid):
+            pid = self.leading_player
         if pid == 0:
             return 2
         elif pid == 1:
