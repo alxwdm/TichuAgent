@@ -22,7 +22,7 @@ class Player():
 
     def remove_cards(self, cards):
         if self.hand.contains(cards):
-            for crd in cards:
+            for crd in cards.cards:
                 self.hand.remove(crd)
             self._update()
             return True
