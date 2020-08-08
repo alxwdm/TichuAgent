@@ -41,8 +41,9 @@ class Stack():
             self._update()
             return True
         elif self.type == cards_to_add.type and self.power < cards_to_add.power:
-            # TODO: check pair_seq lengths
             if self.type == 'straight' and not(len(self.cards) == len(cards_to_add.cards)):
+                return False
+            elif self.type == 'pair_seq' and not(len(self.cards) == len(cards_to_add.cards)):
                 return False
             else:
                 self.cards.append(cards_to_add)
