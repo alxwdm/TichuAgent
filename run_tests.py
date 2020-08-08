@@ -18,11 +18,17 @@ COMB_TYPES = {'solo': 0,
               'straight_bomb': 6,
               'pair_seq': 7}
 
-def play_dumb_game(max_steps=200):
-    """
-    This function plays a game with dumb heuristic players
-    """
-    game = Game(verbose=1)
+COMB_TYPES = {'solo': 0,
+              'pair': 1,
+              'triple': 2,
+              'four_bomb': 3,
+              'full': 4,
+              'straight': 5,
+              'straight_bomb': 6,
+              'pair_seq': 7}
+
+def play_dumb_game(max_steps=200, verbose=1):
+    game = Game(verbose=verbose)
     step_cnt = 0
     game_active = True
     while game_active:
@@ -42,14 +48,14 @@ def play_dumb_game(max_steps=200):
             if avail_comb[leading_idx]:
                 for i in range(len(avail_comb[leading_idx])):
                     suc = game.step(active_player, avail_comb[leading_idx][i])  
-                if suc:
-                    break
+                    if suc:
+                        break
             # Try to bomb if no combination exists
             if not(suc) and avail_comb[COMB_TYPES['four_bomb']]:
                 suc = game.step(active_player, avail_comb[COMB_TYPES['four_bomb']][0])
             elif not(suc) and avail_comb[COMB_TYPES['straight_bomb']]:
                 suc = game.step(active_player, avail_comb[COMB_TYPES['straight_bomb']][0])
-              # pass if nothing works
+            # pass if nothing works
             elif not(suc):
                 game.step(active_player, Cards([]))
         # pass if teammate is leading player
@@ -59,10 +65,9 @@ def play_dumb_game(max_steps=200):
         step_cnt += 1
         if game.game_finished or step_cnt >= max_steps:
             game_active=False
-            if step_cnt >= max_steps:
+            if step_cnt >= max_steps and verbose > 1:
                 print('max_steps exceeded, aborting game.')
             break
-
 
 def run_tests():
     """
@@ -408,10 +413,12 @@ def run_tests():
         # run x random games
         game_cnt = 0
         while game_cnt < TEST_N_GAME:
-            play_dumb_game()
+            play_dumb_game(verbose=0)
             game_cnt += 1
 
         print('done!')
 
 # run as script
-run_tests()
+# run as script
+if __name__ == "__main__":
+    run_tests()
