@@ -143,7 +143,7 @@ class Game():
                 return True
             # invalid move
             else:
-                if self.verbose > 0:
+                if self.verbose > 1:
                     print('Invalid move by player {0}'.format(player_id))
                 return False
 
