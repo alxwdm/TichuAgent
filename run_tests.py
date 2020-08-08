@@ -316,10 +316,10 @@ def run_tests():
         # test instantiating and dealing the deck
         deck = Deck()
         sets = deck.shuffle_and_deal()
-        assert len(sets[0]) == 14
-        assert len(sets[1]) == 14
-        assert len(sets[2]) == 14
-        assert len(sets[3]) == 14
+        assert sets[0].size == 14
+        assert sets[0].size == 14
+        assert sets[0].size == 14
+        assert sets[0].size == 14
 
         print('done!')
 
