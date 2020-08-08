@@ -85,7 +85,7 @@ class Game():
                 if not(suc): # This should never happen
                     print('Could not remove players cards.')
                     return
-                self.pass_counter = max(0, self.pass_counter-1)
+                self.pass_counter = 0
                 if self.verbose > 0:
                     print('Player {0} plays {1}.'.format(player_id, cards.type))
                     cards.show()
