@@ -1,13 +1,13 @@
 # Test cases for Python Implementation of Tichu
 
 # import all
-from Card import Card
-from Cards import Cards
-from Deck import Deck
-from Stack import Stack
-from Player import Player
-from Game import Game
-from Env import Env
+from env.Card import Card
+from env.Cards import Cards
+from env.Deck import Deck
+from env.Stack import Stack
+from env.Player import Player
+from env.Game import Game
+from env.Env import Env
 
 COMB_TYPES = {'solo': 0,
               'pair': 1,
