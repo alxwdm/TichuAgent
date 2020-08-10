@@ -419,6 +419,5 @@ def run_tests():
         print('done!')
 
 # run as script
-# run as script
 if __name__ == "__main__":
     run_tests()
