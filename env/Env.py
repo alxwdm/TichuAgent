@@ -63,7 +63,7 @@ class Env():
             hand_size = self.game.players[pid].hand_size
             tichu_flag = int(self.game.players[pid].tichu_flag)
             if pid == active_player:
-                player_cards = self._cards_to_vec(self.game.players[pid].hand.cards)
+                player_cards = self._cards_to_vec(self.game.players[pid].hand)
             else:
                 player_cards = np.zeros(len(self.all_cards), int).tolist()
             state.append([hand_size, tichu_flag, player_cards])
