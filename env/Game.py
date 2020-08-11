@@ -121,7 +121,7 @@ class Game():
                                 print('Tichu by player {0} was not successfull!'.format(player_id))
                     # regular game end
                     elif len(self.players_finished) == 3:
-                    	self.game_finished = True
+                        self.game_finished = True
                         # get first and last finisher
                         first = self.players_finished[0]
                         for i in range(4):

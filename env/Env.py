@@ -29,7 +29,7 @@ class Env():
         Spd_Q , Hrt_Q , Dia_Q , Clb_Q, Spd_K , Hrt_K , Dia_K , Clb_K,
         Spd_A , Hrt_A , Dia_A , Clb_A, Phoenix, Dragon, Majong, Dog] 
         """
-    	self.game = None
+        self.game = None
         self.state = None
         self.rewards = None
         self.done = False
@@ -63,10 +63,10 @@ class Env():
             hand_size = self.game.players[pid].hand_size
             tichu_flag = self.game.players[pid].tichu_flag
             if pid == active_player:
-            	player_cards = self._cards_to_vec(self.game.players[pid].hand)
+                player_cards = self._cards_to_vec(self.game.players[pid].hand)
             else:
-            	player_cards = np.zeros(len(self.all_cards))
-        	state.append([hand_size, tichu_flag, player_cards])
+                player_cards = np.zeros(len(self.all_cards)).tolist()
+            state.append([hand_size, tichu_flag, player_cards])
         self.state = state
         return 
 
