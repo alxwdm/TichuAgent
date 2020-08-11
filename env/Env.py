@@ -16,7 +16,7 @@ class Env():
             self.verbose = 0
         else:
             self.verbose = 1
-        self.state_size = 0 # TODO
+        self.state_size = 232
         self.action_size = 56
         self.all_cards = Deck().all_cards
         """ 
@@ -32,14 +32,14 @@ class Env():
         self.game = None
         self.state = None
         self.rewards = None
-        self.done = False
+        self.done = None
         self.reset()
         return
 
     def reset(self):
         self.game = Game(verbose=self.verbose)
-        self.state = self._reset_state()
-        self.rewards = np.zeros(4)
+        self._reset_state()
+        self.rewards = np.zeros(4, int)
         self.done = False
         return self.state, self.rewards, self.done
 
@@ -61,18 +61,22 @@ class Env():
         for i in range(4):
             pid = (active_player + i)%4
             hand_size = self.game.players[pid].hand_size
-            tichu_flag = self.game.players[pid].tichu_flag
+            tichu_flag = int(self.game.players[pid].tichu_flag)
             if pid == active_player:
-                player_cards = self._cards_to_vec(self.game.players[pid].hand)
+                player_cards = self._cards_to_vec(self.game.players[pid].hand.cards)
             else:
-                player_cards = np.zeros(len(self.all_cards)).tolist()
+                player_cards = np.zeros(len(self.all_cards), int).tolist()
             state.append([hand_size, tichu_flag, player_cards])
         self.state = state
         return 
 
     def _cards_to_vec(self, cards):
-        contains_list = [crd in cards for crd in self.all_cards]
-        return np.asarray(contains_list, int).tolist()
+        vec = np.zeros(len(self.all_cards), int)
+        for i in range(len(self.all_cards)):
+            crd = Cards([self.all_cards[i]])
+            if cards.contains(crd):
+                vec[i] = 1
+        return vec.tolist()
 
     def _vec_to_cards(self, vec):
         return Cards(list(compress(self.all_cards, vec)))
