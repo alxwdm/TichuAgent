@@ -17,7 +17,7 @@ class Env():
         else:
             self.verbose = 1
         self.state_size = 0 # TODO
-        self.action_size = 0 # TODO
+        self.action_size = 56
         self.all_cards = Deck().all_cards
         """ 
         all_cards is a list containing:
@@ -72,7 +72,7 @@ class Env():
 
     def _cards_to_vec(self, cards):
         contains_list = [crd in cards for crd in self.all_cards]
-        return np.asarray(contains_list, int)
+        return np.asarray(contains_list, int).tolist()
 
     def _vec_to_cards(self, vec):
         return Cards(list(compress(self.all_cards, vec)))
