@@ -75,5 +75,5 @@ class Env():
         return np.asarray(contains_list, int)
 
     def _vec_to_cards(self, vec):
-        return list(compress(self.all_cards, vec))
+        return Cards(list(compress(self.all_cards, vec)))
 
