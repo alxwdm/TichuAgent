@@ -52,9 +52,9 @@ class Env():
         # initial game state
         # state is always from perspective of active player
         # active_player:     [hand_size, tichu_flag, all_cards (0 / 1 if in hands)]
-        # active_player + 1: [hand_size, tichu_flag, played_cards (0)]
-        # active_player + 2: [hand_size, tichu_flag, played_cards (0)]
-        # active_player + 3: [hand_size, tichu_flag, played_cards (0)]
+        # active_player + 1: [hand_size, tichu_flag, played_cards (0 initially)]
+        # active_player + 2: [hand_size, tichu_flag, played_cards (0 initially)]
+        # active_player + 3: [hand_size, tichu_flag, played_cards (0 initially)]
         """
         state = list()
         active_player = self.game.active_player
