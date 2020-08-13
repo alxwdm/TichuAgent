@@ -55,6 +55,7 @@ class Env():
         # i + 2: [hand_size, tichu_flag, played_cards (0 initially)]
         # i + 3: [hand_size, tichu_flag, played_cards (0 initially)]
         """
+        self.state = list()
         for i in range(4):
             this_player = i
             player_state = list()
@@ -67,8 +68,8 @@ class Env():
                 else:
                     player_cards = np.zeros(len(self.all_cards), int).tolist()
                 player_state.append([hand_size, tichu_flag, player_cards])
-            self.state[i] = player_state
-        return 
+            self.state.append(player_state)
+            return 
 
     def _cards_to_vec(self, cards):
         vec = np.zeros(len(self.all_cards), int)
