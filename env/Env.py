@@ -30,44 +30,44 @@ class Env():
         Spd_A , Hrt_A , Dia_A , Clb_A, Phoenix, Dragon, Majong, Dog] 
         """
         self.game = None
-        self.state = None
-        self.rewards = None
-        self.done = None
+        self.state = [[None], [None], [None], [None]]
+        self.rewards = [None, None, None, None]
+        self.done = False
         self.reset()
         return
 
     def reset(self):
         self.game = Game(verbose=self.verbose)
-        self._reset_state()
-        self.rewards = np.zeros(4, int)
+        self._reset_all_state()
+        self.rewards = [None, None, None, None]
         self.done = False
         return self.state, self.rewards, self.done
 
-    def step(self, action, player_id=None):
+    def step(self, player_id, action):
         # TODO
-        return self.state, self.rewards, self.done
+        return self.state, self.rewards, self.done, self.game.active_player
 
-    def _reset_state(self):
+    def _reset_all_states(self):
         """
-        # initial game state
-        # state is always from perspective of active player
-        # active_player:     [hand_size, tichu_flag, all_cards (0 / 1 if in hands)]
-        # active_player + 1: [hand_size, tichu_flag, played_cards (0 initially)]
-        # active_player + 2: [hand_size, tichu_flag, played_cards (0 initially)]
-        # active_player + 3: [hand_size, tichu_flag, played_cards (0 initially)]
+        # initial game state of player i:
+        # i:     [hand_size, tichu_flag, hand_cards (1/0 of all_cards)]
+        # i + 1: [hand_size, tichu_flag, played_cards (0 initially)]
+        # i + 2: [hand_size, tichu_flag, played_cards (0 initially)]
+        # i + 3: [hand_size, tichu_flag, played_cards (0 initially)]
         """
-        state = list()
-        active_player = self.game.active_player
         for i in range(4):
-            pid = (active_player + i)%4
-            hand_size = self.game.players[pid].hand_size
-            tichu_flag = int(self.game.players[pid].tichu_flag)
-            if pid == active_player:
-                player_cards = self._cards_to_vec(self.game.players[pid].hand)
-            else:
-                player_cards = np.zeros(len(self.all_cards), int).tolist()
-            state.append([hand_size, tichu_flag, player_cards])
-        self.state = state
+            this_player = i
+            player_state = list()
+            for i in range(4):
+                pid = (this_player + i)%4
+                hand_size = self.game.players[pid].hand_size
+                tichu_flag = int(self.game.players[pid].tichu_flag)
+                if pid == this_player:
+                    player_cards = self._cards_to_vec(self.game.players[pid].hand)
+                else:
+                    player_cards = np.zeros(len(self.all_cards), int).tolist()
+                player_state.append([hand_size, tichu_flag, player_cards])
+            self.state[i] = player_state
         return 
 
     def _cards_to_vec(self, cards):
@@ -80,4 +80,3 @@ class Env():
 
     def _vec_to_cards(self, vec):
         return Cards(list(compress(self.all_cards, vec)))
-
