@@ -32,6 +32,7 @@ class Env():
         Spd_A , Hrt_A , Dia_A , Clb_A, Phoenix, Dragon, Majong, Dog] 
         """
         self.game = None
+        self.action_buffer = [[None], [None], [None], [None]]
         self.state = [[None], [None], [None], [None]]
         self.rewards = [None, None, None, None]
         self.done = False
@@ -50,6 +51,10 @@ class Env():
         return state, rewards, done, active_player
 
     def step(self, player_id, action):
+    	# save pre-step stack state
+    	leading_player = self.game.leading_player
+    	stack_points = self.game.stack.stack_points
+    	stack_size = len(self.game.stack.cards)
         # convert action vector and make game step
         cards = _vec_to_cards(action)
         suc = self.game.step(player_id, cards)
@@ -58,7 +63,8 @@ class Env():
             self.rewards[player_id] = ILLEGAL_MOVE_PENALTY
         # legal move
         else:
-            # TODO
+            self._update_action_buffer(player_id, action)
+            self._update_all_states()
             pass
         state = self.state
         rewards = self.rewards
@@ -89,6 +95,28 @@ class Env():
                 player_state.append([hand_size, tichu_flag, player_cards])
             self.state.append(player_state)
             return 
+
+    def _update_all_states(self):
+        # updates states with latest action taken by other players
+        self.state = list()
+        for i in range(4):
+            this_player = i
+            player_state = list()
+            for i in range(4):
+                pid = (this_player + i)%4
+                hand_size = self.game.players[pid].hand_size
+                tichu_flag = int(self.game.players[pid].tichu_flag)
+                if pid == this_player:
+                    player_cards = self._cards_to_vec(self.game.players[pid].hand)
+                else:
+                    player_cards = self.action_buffer[pid]
+                player_state.append([hand_size, tichu_flag, player_cards])
+            self.state.append(player_state) 
+            return
+
+    def _update_action_buffer(self, player_id, action):
+        self.action_buffer[player_id] = action
+        return
 
     def _cards_to_vec(self, cards):
         vec = np.zeros(len(self.all_cards), int)
