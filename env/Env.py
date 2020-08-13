@@ -8,6 +8,8 @@ from env.Cards import Cards
 from env.Deck import Deck
 from env.Game import Game
 
+ILLEGAL_MOVE_PENALTY = -10
+
 class Env():
 
     def __init__(self, train_mode=True):
@@ -41,11 +43,28 @@ class Env():
         self._reset_all_states()
         self.rewards = [None, None, None, None]
         self.done = False
-        return self.state, self.rewards, self.done
+        state = self.state
+        rewards = self.rewards
+        done = self.done
+        active_player = self.game.active_player
+        return state, rewards, done, active_player
 
     def step(self, player_id, action):
-        # TODO
-        return self.state, self.rewards, self.done, self.game.active_player
+        # convert action vector and make game step
+        cards = _vec_to_cards(action)
+        suc = self.game.step(player_id, cards)
+        # illegal move
+        if not(suc):
+            self.rewards[player_id] = ILLEGAL_MOVE_PENALTY
+        # legal move
+        else:
+            # TODO
+            pass
+        state = self.state
+        rewards = self.rewards
+        done = self.done
+        active_player = self.game.active_player
+        return state, rewards, done, active_player
 
     def _reset_all_states(self):
         """
