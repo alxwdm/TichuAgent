@@ -38,7 +38,7 @@ class Env():
 
     def reset(self):
         self.game = Game(verbose=self.verbose)
-        self._reset_all_state()
+        self._reset_all_states()
         self.rewards = [None, None, None, None]
         self.done = False
         return self.state, self.rewards, self.done
