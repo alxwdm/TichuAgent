@@ -18,15 +18,6 @@ COMB_TYPES = {'solo': 0,
               'straight_bomb': 6,
               'pair_seq': 7}
 
-COMB_TYPES = {'solo': 0,
-              'pair': 1,
-              'triple': 2,
-              'four_bomb': 3,
-              'full': 4,
-              'straight': 5,
-              'straight_bomb': 6,
-              'pair_seq': 7}
-
 def play_dumb_game(max_steps=200, verbose=1):
     game = Game(verbose=verbose)
     step_cnt = 0
