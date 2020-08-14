@@ -94,7 +94,7 @@ class Env():
                     player_cards = np.zeros(len(self.all_cards), int).tolist()
                 player_state.append([hand_size, tichu_flag, player_cards])
             self.state.append(player_state)
-            return 
+        return 
 
     def _update_all_states(self):
         # updates states with latest action taken by other players
