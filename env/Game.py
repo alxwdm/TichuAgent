@@ -85,8 +85,18 @@ class Game():
             if suc1 and suc2:
                 if cards.cards[0].name == 'Dog':
                     teammate = self._get_teammate(player_id)
-                    self.active_player = teammate
-                    self.leading_player = teammate
+                    if not(teammate in self.players_finished):
+                        self.active_player = teammate
+                        self.leading_player = teammate
+                    elif not((teammate+1)%4 in self.players_finished):
+                        self.active_player = (teammate+1)%4
+                        self.leading_player = (teammate+1)%4
+                    elif not((self.leading_player+2)%4 in self.players_finished):
+                        self.active_player = (teammate+2)%4
+                        self.leading_player = (teammate+2)%4
+                    else:
+                        self.active_player = (teammate+3)%4
+                        self.leading_player = (teammate+3)%4
                     self.stack = Stack()
                 else:
                     self.leading_player = player_id
