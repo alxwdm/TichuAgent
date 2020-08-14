@@ -67,10 +67,13 @@ class Game():
                     self.active_player = self.leading_player
                 elif not((self.leading_player+1)%4 in self.players_finished):
                     self.leading_player = (self.leading_player+1)%4
+                    self.active_player = self.leading_player
                 elif not((self.leading_player+2)%4 in self.players_finished):
                     self.leading_player = (self.leading_player+2)%4
+                    self.active_player = self.leading_player
                 else:
                     self.leading_player = (self.leading_player+3)%4
+                    self.active_player = self.leading_player
                 self.pass_counter = 0
             # stack not finished, next players turn
             else:
@@ -115,7 +118,8 @@ class Game():
                         print('Player {0} has finished on position {1}!'.format(
                             player_id, len(self.players_finished)+1))
                     self.players_finished.append(player_id)
-                    self.active_player = (player_id+1)%4
+                    if not(cards.cards[0].name == 'Dog'):
+                        self.active_player = (player_id+1)%4
                     # check if game has finished
                     # double-team victory, game is finished and points by cards are discarded
                     if len(self.players_finished) == 2 and sum(self.players_finished)%2 == 0:
