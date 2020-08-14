@@ -51,10 +51,10 @@ class Env():
         return state, rewards, done, active_player
 
     def step(self, player_id, action):
-    	# save pre-step stack state
-    	leading_player = self.game.leading_player
-    	stack_points = self.game.stack.stack_points
-    	stack_size = len(self.game.stack.cards)
+        # save pre-step stack state
+        leading_player = self.game.leading_player
+        stack_points = self.game.stack.stack_points
+        stack_size = len(self.game.stack.cards)
         # convert action vector and make game step
         cards = _vec_to_cards(action)
         suc = self.game.step(player_id, cards)
