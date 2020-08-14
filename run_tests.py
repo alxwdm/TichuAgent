@@ -37,7 +37,7 @@ def play_dumb_game(max_steps=200, verbose=1):
         # make a random move if stack is empty
         if not(game.stack.cards) and not(game.players[active_player].has_finished()):
             comb = game.players[active_player].random_move()
-            suc = game.step(active_player, comb)
+            suc, _ = game.step(active_player, comb)
         # try to make a matching move if opponent is leading
         elif ((active_player+leading_player)%2) !=0:
             leading_type = game.stack.type
@@ -47,20 +47,20 @@ def play_dumb_game(max_steps=200, verbose=1):
             suc = False
             if avail_comb[leading_idx]:
                 for i in range(len(avail_comb[leading_idx])):
-                    suc = game.step(active_player, avail_comb[leading_idx][i])  
+                    suc, _ = game.step(active_player, avail_comb[leading_idx][i])  
                     if suc:
                         break
             # Try to bomb if no combination exists
             if not(suc) and avail_comb[COMB_TYPES['four_bomb']]:
-                suc = game.step(active_player, avail_comb[COMB_TYPES['four_bomb']][0])
+                suc, _ = game.step(active_player, avail_comb[COMB_TYPES['four_bomb']][0])
             elif not(suc) and avail_comb[COMB_TYPES['straight_bomb']]:
-                suc = game.step(active_player, avail_comb[COMB_TYPES['straight_bomb']][0])
+                suc, _ = game.step(active_player, avail_comb[COMB_TYPES['straight_bomb']][0])
             # pass if nothing works
             elif not(suc):
-                game.step(active_player, Cards([]))
+                suc, _ = game.step(active_player, Cards([]))
         # pass if teammate is leading player
         else:
-            game.step(active_player, Cards([]))
+            suc, _ = game.step(active_player, Cards([]))
         # stop if game is finished (or counter overflow)
         step_cnt += 1
         if game.game_finished or step_cnt >= max_steps:

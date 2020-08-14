@@ -41,11 +41,12 @@ class Game():
         self.game_finished = False
 
     def step(self, player_id, cards):
+        points_this_step = [0, 0, 0, 0]
         if not(player_id == self.active_player):
             if self.verbose > 0:
                 print('Player {0} tried to make a move, but active player is {1}.'.format(
                     player_id, self.active_player))
-            return
+            return False, points_this_step
         # active player passes 
         if cards.type == 'pass':
             if self.verbose > 0:
@@ -55,9 +56,10 @@ class Game():
             if self.pass_counter >= 3:
                 # if stack contains Dragon, it must be given to opponent player
                 if self.stack.dragon_flag:
-                    self._dragon_stack() 
+                    points_this_step = self._dragon_stack() 
                 else:
                     self.players[self.leading_player].add_points(self.stack.points)
+                    points_this_step[self.leading_player] = self.stack.points
                 # initialize new round 
                 self.stack = Stack()
                 self.active_player = self.leading_player
@@ -65,7 +67,7 @@ class Game():
             # stack not finished, next players turn
             else:
                 self.active_player = (player_id+1)%4
-            return True
+            return True, points_this_step
         # active player plays cards
         else:
             # check if cards to play is in hands of player 
@@ -108,15 +110,21 @@ class Game():
                         self.players[teammate].set_points(100)
                         self.players[opponents[0]].set_points(0)
                         self.players[opponents[1]].set_points(0)
+                        points_this_step[player_id] = 100
+                        points_this_step[teammate] = 100
+                        points_this_step[opponents[0]] = 0
+                        points_this_step[opponents[1]] = 0
                         self.game_finished = True
                     # if player called tichu and finished, check if tichu is successfull
                     if self.players[player_id].tichu_flag:
                         if len(self.players_finished == 1):
                             self.players[player_id].add_points(100)
+                            points_this_step[player_id] += 100
                             if self.verbose > 0:
                                 print('Successfull Tichu by player {0}!'.format(player_id))
                         else:
                             self.players[player_id].add_points(-100)
+                            points_this_step[player_id] -= 100
                             if self.verbose > 0:
                                 print('Tichu by player {0} was not successfull!'.format(player_id))
                     # regular game end
@@ -131,22 +139,29 @@ class Game():
                         hand_points_last = self.players[last].hand.points
                         opponents = self._get_opponents(pid=last)
                         self.players[opponents[0]].add_points(hand_points_last)
+                        points_this_step[opponents[0]] = hand_points_last
                         # first finisher gets stack of last finisher
                         stack_points_last = self.players[last].points
                         self.players[first].add_points(stack_points_last)
+                        points_this_step[first] += stack_points_last
                         self.players[last].set_points(0)
+                        points_this_step[last] = 0
+                        # if remaining player called tichu -> tichu failed
+                        if self.players[last].tichu_flag:
+                            self.players[last].add_points(-100)
+                            points_this_step[last] -= 100
                         if self.verbose > 0:
                             print('Game is finished!')
                             print('Score of player 0 and player 2: {0}'.format(
                                 (self.players[0].points + self.players[2].points)))
                             print('Score of player 1 and player 3: {0}'.format(
                                 (self.players[1].points + self.players[3].points)))
-                return True
+                return True, points_this_step
             # invalid move
             else:
                 if self.verbose > 1:
                     print('Invalid move by player {0}'.format(player_id))
-                return False
+                return False, points_this_step
 
     def show_hands(self, pid=None):
         if pid:
@@ -182,25 +197,31 @@ class Game():
         # give dragon stack to opponent player according to a simple heuristic
         # determine opponents
         opponents = self._get_opponents()
+        points_this_step = [0, 0, 0, 0]
         # if either opponent has called tichu, give cards to other opponent
         if self.players[opponents[0]].tichu_flag:
             self.players[opponents[1]].add_points(self.stack.points)
+            points_this_step[opponents[1]] = self.stack.points
             if self.verbose > 0:
                 print('Player {0} gave dragon stack to player {1}'.format(
-                    self.leading_player, opponents[1]))
+                    self.leading_player, opponents[1]))            
         elif self.players[opponents[1]].tichu_flag:
             self.players[opponents[0]].add_points(self.stack.points)
+            points_this_step[opponents[0]] = self.stack.points
             if self.verbose > 0:
                 print('Player {0} gave dragon stack to player {1}'.format(
                     self.leading_player, opponents[0]))
         # if no tichu called by opposite team, give dragon to player with more hand cards
         elif self.players[opponents[0]].hand_size < self.players[opponents[1]].hand_size:
             self.players[opponents[1]].add_points(self.stack.points)
+            points_this_step[opponents[1]] = self.stack.points
             if self.verbose > 0:
                 print('Player {0} gave dragon stack to player {1}'.format(
                     self.leading_player, opponents[1]))
         else:
             self.players[opponents[0]].add_points(self.stack.points)
+            points_this_step[opponents[0]] = self.stack.points
             if self.verbose > 0:
                 print('Player {0} gave dragon stack to player {1}'.format(
                     self.leading_player, opponents[0]))
+        return points_this_step
