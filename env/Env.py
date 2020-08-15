@@ -51,13 +51,9 @@ class Env():
         return state, rewards, done, active_player
 
     def step(self, player_id, action):
-        # save pre-step stack state
-        leading_player = self.game.leading_player
-        stack_points = self.game.stack.stack_points
-        stack_size = len(self.game.stack.cards)
         # convert action vector and make game step
         cards = _vec_to_cards(action)
-        suc = self.game.step(player_id, cards)
+        suc, points_this_step = self.game.step(player_id, cards)
         # illegal move
         if not(suc):
             self.rewards[player_id] = ILLEGAL_MOVE_PENALTY
@@ -65,7 +61,10 @@ class Env():
         else:
             self._update_action_buffer(player_id, action)
             self._update_all_states()
-            pass
+        # check if game is finished
+        if self.game.game_finished:
+        	self.done = True
+        # return step variables
         state = self.state
         rewards = self.rewards
         done = self.done
