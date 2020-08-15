@@ -36,7 +36,6 @@ class Env():
         self.state = [[None], [None], [None], [None]]
         self.rewards = [None, None, None, None]
         self.done = False
-        self.reset()
         return
 
     def reset(self):
@@ -52,7 +51,7 @@ class Env():
 
     def step(self, player_id, action):
         # convert action vector and make game step
-        cards = _vec_to_cards(action)
+        cards = self._vec_to_cards(action)
         suc, points_this_step = self.game.step(player_id, cards)
         # illegal move
         if not(suc):
@@ -111,7 +110,7 @@ class Env():
                     player_cards = self.action_buffer[pid]
                 player_state.append([hand_size, tichu_flag, player_cards])
             self.state.append(player_state) 
-            return
+        return
 
     def _update_action_buffer(self, player_id, action):
         self.action_buffer[player_id] = action
