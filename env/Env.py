@@ -36,6 +36,7 @@ class Env():
         self.state = [[None], [None], [None], [None]]
         self.rewards = [None, None, None, None]
         self.done = False
+        self.pass_counter = 0 # only for debugging
         return
 
     def reset(self):
@@ -60,14 +61,27 @@ class Env():
         else:
             self._update_action_buffer(player_id, action)
             self._update_all_states()
+            # reset state and action_buffer if Dog has been played
+            # (required because Dog skips players)
+            if cards.cards[0].name == 'Dog':
+                self._reset_all_states()
+                self._reset_action_buffer()
         # check if game is finished
         if self.game.game_finished:
-        	self.done = True
+            self.done = True
         # return step variables
         state = self.state
         rewards = self.rewards
         done = self.done
         active_player = self.game.active_player
+        # only for debugging
+        if cards.type == 'pass':
+            self.pass_counter += 1
+            if self.pass_counter >= 10:
+                done = True
+                print('Loop detected, aborting...')
+        else:
+            self.pass_counter = 0
         return state, rewards, done, active_player
 
     def _reset_all_states(self):
@@ -110,6 +124,11 @@ class Env():
                     player_cards = self.action_buffer[pid]
                 player_state.append([hand_size, tichu_flag, player_cards])
             self.state.append(player_state) 
+        return
+
+    def _reset_action_buffer(self):
+        for i in range(4):
+            self.action_buffer[i] = np.zeros(len(self.all_cards), int).tolist()
         return
 
     def _update_action_buffer(self, player_id, action):
