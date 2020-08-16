@@ -44,9 +44,9 @@ class Stack():
         # if stack contains cards, must be same type and higher power
         elif self.type == cards_to_add.type and self.power < cards_to_add.power:
             # for straight and pair_seq, equal lengths are required
-            if self.type == 'straight' and not(len(self.cards) == len(cards_to_add.cards)):
+            if self.type == 'straight' and not(self.cards[-1].size == cards_to_add.size):
                 return False
-            elif self.type == 'pair_seq' and not(len(self.cards) == len(cards_to_add.cards)):
+            elif self.type == 'pair_seq' and not(self.cards[-1].size == cards_to_add.size):
                 return False
             # Dog can only be played as first card
             elif cards_to_add.cards[0].name == 'Dog':
