@@ -63,7 +63,9 @@ class Env():
             self._update_all_states()
             # reset state and action_buffer if Dog has been played
             # (required because Dog skips players)
-            if cards.cards[0].name == 'Dog':
+            if cards.type == 'pass':
+                pass
+            elif cards.cards[0].name == 'Dog':
                 self._reset_all_states()
                 self._reset_action_buffer()
         # check if game is finished

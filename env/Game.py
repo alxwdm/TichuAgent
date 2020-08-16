@@ -63,17 +63,18 @@ class Game():
                 # initialize new round 
                 self.stack = Stack()
                 # transmit leading player if player has finished
+                # (but do not skip finished players from being active)
                 if not(self.leading_player in self.players_finished):
                     self.active_player = self.leading_player
                 elif not((self.leading_player+1)%4 in self.players_finished):
                     self.leading_player = (self.leading_player+1)%4
-                    self.active_player = self.leading_player
+                    #self.active_player = self.leading_player
                 elif not((self.leading_player+2)%4 in self.players_finished):
                     self.leading_player = (self.leading_player+2)%4
-                    self.active_player = self.leading_player
+                    #self.active_player = self.leading_player
                 else:
                     self.leading_player = (self.leading_player+3)%4
-                    self.active_player = self.leading_player
+                    #self.active_player = self.leading_player
                 self.pass_counter = 0
             # stack not finished, next players turn
             else:

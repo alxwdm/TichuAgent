@@ -51,15 +51,17 @@ class greedyAgent():
             # determine leading opponent type and power
             if (opp_cards_0.power > opp_cards_0.power) or (opp_cards_1.type == 'pass'):
                 leading_type = opp_cards_0.type
+                leading_size = opp_cards_0.size
                 leading_power = opp_cards_0.power
             else:
                 leading_type = opp_cards_1.type
+                leading_size = opp_cards_1.size
                 leading_power = opp_cards_1.power 
             type_index = COMB_TYPES[leading_type]
             # check if leading type is available and can be beaten
             if available_comb[type_index]:
                 for crds in available_comb[type_index]:
-                    if crds.power > leading_power:
+                    if crds.power > leading_power and crds.size == leading_size:
                         action = self._cards_to_vec(crds)
                         return action
                 # pass if no higher combination available
