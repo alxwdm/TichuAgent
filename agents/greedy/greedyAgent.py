@@ -61,7 +61,9 @@ class greedyAgent():
             # check if leading type is available and can be beaten
             if available_comb[type_index]:
                 for crds in available_comb[type_index]:
-                    if crds.power > leading_power and crds.size == leading_size:
+                    if crds.cards[0].name == 'Dog': # Dog can only be played alone
+                        pass
+                    elif crds.power > leading_power and crds.size == leading_size:
                         action = self._cards_to_vec(crds)
                         return action
                 # pass if no higher combination available
