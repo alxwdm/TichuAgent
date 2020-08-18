@@ -68,13 +68,10 @@ class Game():
                     self.active_player = self.leading_player
                 elif not((self.leading_player+1)%4 in self.players_finished):
                     self.leading_player = (self.leading_player+1)%4
-                    #self.active_player = self.leading_player
                 elif not((self.leading_player+2)%4 in self.players_finished):
                     self.leading_player = (self.leading_player+2)%4
-                    #self.active_player = self.leading_player
                 else:
                     self.leading_player = (self.leading_player+3)%4
-                    #self.active_player = self.leading_player
                 self.pass_counter = 0
             # stack not finished, next players turn
             else:
