@@ -70,7 +70,7 @@ class greedyAgent():
                 action = self._cards_to_vec(Cards([]))
                 return action
             # if no combination exists, try to four bomb or straight bomb
-            elif available_comb[COMB_TYPES['four_bomb']]:
+            elif available_comb[COMB_TYPES['four_bomb']] and not(leading_type == 'straight_bomb'):
                 bomb = available_comb[COMB_TYPES['four_bomb']][0]
                 action = self._cards_to_vec(bomb)
                 return action
