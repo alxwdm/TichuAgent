@@ -61,17 +61,22 @@ class Env():
         else:
             self._update_action_buffer(player_id, action)
             self._update_all_states()
-            if cards.type == 'pass':
+            # reset state and action buffer if stack has been emptied 
+            if not(self.game.stack.cards):
+                print('state has been reseted!')
+                self._reset_all_states()
+                self._reset_action_buffer() 
+            # do nothing on a regular pass move   
+            elif cards.type == 'pass':
                 pass
             # reset state and action_buffer if Dog has been played
             # (required because Dog skips players)
             elif cards.cards[0].name == 'Dog':
                 self._reset_all_states()
                 self._reset_action_buffer()
-            # reset state and action buffer if stack has been emptied
-            elif not(self.game.stack.cards):
-                self._reset_all_states()
-                self._reset_action_buffer()            	
+            # do nothing if neither is the case (regular game move)
+            else:
+                pass
         # check if game is finished
         if self.game.game_finished:
             self.done = True
