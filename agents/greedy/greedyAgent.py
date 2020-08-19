@@ -5,8 +5,8 @@ import random
 import numpy as np
 from itertools import compress
 
-from tichuagent.env.Cards import Cards 
-from tichuagent.env.Deck import Deck
+from tichuagent.env.cards import Cards 
+from tichuagent.env.deck import Deck
 
 COMB_TYPES = {'solo': 0,
               'pair': 1,
