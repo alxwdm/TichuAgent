@@ -1,6 +1,6 @@
 # Stack class for Python Implementation of Tichu
 
-from env.Cards import Cards
+from env.cards import Cards
 
 BOMBS = ['four_bomb', 'straight_bomb']
 

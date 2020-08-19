@@ -6,7 +6,7 @@
 import random
 from collections import defaultdict
 
-from env.Card import Card
+from env.card import Card
 
 BOMBS = ['four_bomb', 'straight_bomb']
 

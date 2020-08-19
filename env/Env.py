@@ -4,9 +4,9 @@
 import numpy as np
 from itertools import compress
 
-from env.Cards import Cards
-from env.Deck import Deck
-from env.Game import Game
+from env.cards import Cards
+from env.deck import Deck
+from env.game import Game
 
 ILLEGAL_MOVE_PENALTY = -10
 

@@ -2,10 +2,10 @@
 
 import random
 
-from env.Cards import Cards
-from env.Deck import Deck
-from env.Player import Player
-from env.Stack import Stack
+from env.cards import Cards
+from env.deck import Deck
+from env.player import Player
+from env.stack import Stack
 
 class Game():
 

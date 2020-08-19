@@ -1,7 +1,7 @@
 # Player class for Python Implementation of Tichu
 
 import random
-from env.Cards import Cards
+from env.cards import Cards
 
 
 class Player():
