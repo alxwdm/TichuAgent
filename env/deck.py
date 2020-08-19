@@ -2,8 +2,8 @@
 
 import random
 
-from env.Card import Card
-from env.Cards import Cards
+from env.card import Card
+from env.cards import Cards
 
 class Deck():
 
