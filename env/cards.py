@@ -472,7 +472,7 @@ class Cards():
     def __repr__(self):
         card_str = ''
         for crd in self.cards:
-            card_str = card_str + str(crd.name) + ' ' + str(crd.suit) + ' ,'
+            card_str = card_str + str(crd.name) + ' ' + str(crd.suit) + ', '
         return str({'type': self.type,
                     'size': self.size,
                     'cards': card_str})
