@@ -8,6 +8,7 @@ from env.stack import Stack
 from env.player import Player
 from env.game import Game
 from env.env import Env
+from agents.heuristic.greedy import greedyAgent
 
 COMB_TYPES = {'solo': 0,
               'pair': 1,
@@ -21,7 +22,8 @@ COMB_TYPES = {'solo': 0,
 def play_dumb_game(max_steps=1000, verbose=1):
     """
     This function plays a Tichu game with four "dumb" players.
-    Each player iterates over available combinations and tries to beat opponents.
+    Each player iterates over all available combinations and tries to beat opponents.
+    New stacks are played with a random combination.
     """
     game = Game(verbose=verbose)
     step_cnt = 0
@@ -61,5 +63,33 @@ def play_dumb_game(max_steps=1000, verbose=1):
         if game.game_finished or step_cnt >= max_steps:
             game_active=False
             if step_cnt >= max_steps and verbose > 1:
-                print('max_steps exceeded, aborting game.')
+                raise Exception("Max. steps exceeded. Possible infinity loop detected.")
             break
+
+def play_greedy_game(verbose=True):
+    """
+    This function plays a Tichu game with four "greedy" players.
+    Uses greedyAgent. 
+    This is an Agent with very simple heuristic play moves.
+    Always tries to win a stack except opponent is leading.
+    Raises an Exception if 10 consecutive false moves are made.
+    (This should not happen when environment and greedyAgent is bugfree.)
+    """
+    agent = greedyAgent()
+    env = Env(train_mode=not(verbose))
+    state, rewards, done, active_player = env.reset()
+    conseq_active_counter = 0
+    while True:
+        my_state = state[active_player]
+        action = agent.act(my_state)
+        last_active = active_player
+        state, rewards, done, active_player = env.step(active_player, action)
+        new_active = active_player
+        if last_active == new_active:
+            conseq_active_counter += 1
+        else:
+             conseq_active_counter = 0
+        if done:
+               return
+        if conseq_active_counter > 10:
+               raise Exception("Active counter exceeded. Possible infinity loop detected.")
