@@ -63,7 +63,6 @@ class Env():
             self._update_all_states()
             # reset state and action buffer if stack has been emptied 
             if not(self.game.stack.cards):
-                print('state has been reseted!')
                 self._reset_all_states()
                 self._reset_action_buffer() 
             # do nothing on a regular pass move   
