@@ -147,14 +147,15 @@ class Cards():
                 for i in range(len(card_set)-2):
                     if card_set[i+1].power + 1 == card_set[i+2].power:
                         pass
-                    elif not(phoenix_used):
+                    elif not(phoenix_used) and (card_set[i+1].power + 2 == card_set[i+2].power):
                         phoenix_used = True
                         phoenix_idx = i+1
                     else:
                         is_straight = False
                 if is_straight:
                     self.type = 'straight'
-                    if phoenix_idx == len(card_set): # phoenix is last card of straight
+                    # phoenix is last card of straight
+                    if not(phoenix_used) or (phoenix_idx == len(card_set)): 
                         self.power = card_set[-1].power+1
                     else:
                         self.power = card_set[-1].power
@@ -375,7 +376,6 @@ class Cards():
                 else:
                     break
         # pair_seq
-        # TODO: re-check this!
         for i in range(len(pair)-1):
             candidate_list = list()
             for j in range(i,len(pair)):
