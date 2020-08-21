@@ -79,10 +79,12 @@ def play_greedy_game(verbose=True):
     env = Env(train_mode=not(verbose))
     state, rewards, done, active_player = env.reset()
     conseq_active_counter = 0
+    cummulative_reward = [0, 0, 0, 0]
     while True:
         my_state = state[active_player]
         action = agent.act(my_state)
         last_active = active_player
+        cummulative_reward[active_player] += rewards[active_player]
         state, rewards, done, active_player = env.step(active_player, action)
         new_active = active_player
         if last_active == new_active:
@@ -90,6 +92,10 @@ def play_greedy_game(verbose=True):
         else:
              conseq_active_counter = 0
         if done:
+            for i in range(4):
+               cummulative_reward[i] += rewards[i]
+               if verbose:
+                    print('Cummulative reward of player {}: {}'.format(i, cummulative_reward[i]))
                return
         if conseq_active_counter > 10:
                raise Exception("Active counter exceeded. Possible infinity loop detected.")
