@@ -23,6 +23,9 @@ def test_type_h4(hand_4):
 def test_type_h5(hand_5):
     assert hand_5.type == 'hand'
 
+def test_type_h6(hand_6):
+    assert hand_6.type == 'hand'
+
 def test_type_e0(pass_0):
     assert pass_0.type == 'pass'
 
@@ -88,6 +91,9 @@ def test_type_strt5(strt_5):
 
 def test_type_strt6(strt_6):
     assert strt_6.type != 'straight'
+
+def test_type_strt7(strt_7):
+    assert strt_7.type == 'straight'
 
 def test_type_ps0(ps_0):
     assert ps_0.type == 'pair_seq'
@@ -156,6 +162,9 @@ def test_logical_14(ps_2, ps_3):
 
 def test_logical_15(ps_0, ps_4):
     assert (ps_0 <= ps_4) == False
+
+def test_logical_16(strt_3, strt_7):
+    assert (strt_3 > strt_7) == True
 
 # test game points of cards
 
@@ -227,3 +236,14 @@ def test_avail_comb_0(hand_0):
     assert len(avail_combs[5]) == 0
     assert len(avail_combs[6]) == 0
     assert len(avail_combs[7]) == 1
+
+def test_avail_comb_1(hand_6):
+    avail_combs = hand_6.get_available_combinations()
+    assert len(avail_combs[0]) == 12
+    assert len(avail_combs[1]) == 12
+    assert len(avail_combs[2]) == 5
+    assert len(avail_combs[3]) == 0
+    assert len(avail_combs[4]) == 12
+    assert len(avail_combs[5]) == 1
+    assert len(avail_combs[6]) == 0
+    assert len(avail_combs[7]) == 3

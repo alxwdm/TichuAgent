@@ -275,6 +275,10 @@ def hand_5(Clb_2, Phoenix, Spd_4, Clb_4):
     return Cards([Clb_2, Phoenix, Spd_4, Clb_4])
 
 @pytest.fixture(scope='session', autouse='True')
+def hand_6(Majong, Dog, Clb_2, Clb_3, Hrt_4, Phoenix, Dragon, Spd_K, Dia_K, Hrt_K, Clb_A, Hrt_A):
+    return Cards([Majong, Dog, Clb_2, Clb_3, Hrt_4, Phoenix, Dragon, Spd_K, Dia_K, Hrt_K, Clb_A, Hrt_A])
+
+@pytest.fixture(scope='session', autouse='True')
 def pass_0():
     return Cards([])
 
@@ -361,6 +365,10 @@ def strt_5(Spd_5, Hrt_2, Clb_6, Phoenix, Hrt_7):
 @pytest.fixture(scope='session', autouse='True')
 def strt_6(Spd_A, Clb_K, Dia_J, Clb_Q, Dragon):
     return Cards([Spd_A, Clb_K, Dia_J, Clb_Q, Dragon]) # hand (no straight)
+
+@pytest.fixture(scope='session', autouse='True')
+def strt_7(Majong, Hrt_2, Clb_3, Clb_5, Hrt_4):
+    return Cards([Majong, Hrt_2, Clb_3, Clb_5, Hrt_4])
 
 @pytest.fixture(scope='session', autouse='True')
 def ps_0(Spd_J, Dia_J, Clb_Q, Dia_Q):
