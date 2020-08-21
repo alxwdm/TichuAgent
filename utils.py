@@ -96,6 +96,6 @@ def play_greedy_game(verbose=True):
                cummulative_reward[i] += rewards[i]
                if verbose:
                     print('Cummulative reward of player {}: {}'.format(i, cummulative_reward[i]))
-               return
+            return
         if conseq_active_counter > 10:
                raise Exception("Active counter exceeded. Possible infinity loop detected.")
