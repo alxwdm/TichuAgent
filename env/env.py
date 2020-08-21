@@ -42,7 +42,7 @@ class Env():
     def reset(self):
         self.game = Game(verbose=self.verbose)
         self._reset_all_states()
-        self.rewards = [None, None, None, None]
+        self._reset_rewards()
         self.done = False
         state = self.state
         rewards = self.rewards
@@ -62,20 +62,23 @@ class Env():
             self._update_action_buffer(player_id, action)
             self._update_all_states()
             # reset state and action buffer if stack has been emptied 
+            # and update rewards according to points in the stack
             if not(self.game.stack.cards):
                 self._reset_all_states()
                 self._reset_action_buffer() 
-            # do nothing on a regular pass move   
+                self._update_rewards(points_this_step)
+            # update rewards for pass move
             elif cards.type == 'pass':
-                pass
-            # reset state and action_buffer if Dog has been played
+                self._update_rewards(points_this_step)
+            # reset state, action_buffer and rewards if Dog has been played
             # (required because Dog skips players)
             elif cards.cards[0].name == 'Dog':
                 self._reset_all_states()
                 self._reset_action_buffer()
-            # do nothing if neither is the case (regular game move)
+                self._reset_rewards()
+           # update rewards for regular game move
             else:
-                pass
+                self._update_rewards(points_this_step)
         # check if game is finished
         if self.game.game_finished:
             self.done = True
@@ -143,6 +146,43 @@ class Env():
 
     def _update_action_buffer(self, player_id, action):
         self.action_buffer[player_id] = action
+        return
+
+    def _reset_rewards(self):
+        self.rewards = [0, 0, 0, 0]
+        self.nstep = self.game.active_player
+        return
+
+    def _update_rewards(self, points_this_step):
+        """
+        This implemenation of a reward function promises rewards after
+        each round (i.e. consecutive steps of all 4 players).
+        If a player or its teammate (!) gets points during a round 
+        (e.g. by winning a stack), it gets a reward in the amount of 
+        the points in this round.
+        The benefit of this reward function is that each step promises a reward
+        (i.e. no sparse rewards that may impede learning).
+        The danger is that the actual points are assigned at the end of a game, 
+        which means the last player looses all its points to the first finisher.
+        This may lead to a non-ideal game strategy, where lots of rewards might 
+        be collected during the game, but actually the game is lost if the player 
+        does not finish early.
+        Also, cummulative reward is higher for players that finish later.
+        However, if the winning team gets more cumulative reward, then this
+        reward design will still lead to a good policy.
+        """
+        # reset rewards every new player round
+        self.rewards[self.nstep] = 0
+        # accumulate rewards (teammate rewards are also taken into account)
+        # opponent rewards are considered negative
+        rewards_team_0 = (points_this_step[0] + points_this_step[2])
+        rewards_team_1 = (points_this_step[1] + points_this_step[3])
+        self.rewards[0] += (rewards_team_0 - rewards_team_1)
+        self.rewards[1] += (rewards_team_1 - rewards_team_0)
+        self.rewards[2] += (rewards_team_0 - rewards_team_1)
+        self.rewards[3] += (rewards_team_1 - rewards_team_0)
+        # update nstep counter
+        self.nstep = (self.nstep+1)%4
         return
 
     def _cards_to_vec(self, cards):
