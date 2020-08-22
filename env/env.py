@@ -9,10 +9,14 @@ from env.deck import Deck
 from env.game import Game
 
 ILLEGAL_MOVE_PENALTY = -10
+REWARD_STYLE  = 'rich'
 
 class Env():
 
     def __init__(self, train_mode=True):
+        # dispatch table for reward function
+        self.dispatch_reward = {'rich': self._update_rich_rewards,
+                                'sparse': self._update_sparse_rewards}
         # set verbosity according to mode
         if train_mode:
             self.verbose = 0
@@ -154,6 +158,10 @@ class Env():
         return
 
     def _update_rewards(self, points_this_step):
+        self.dispatch_reward[REWARD_STYLE](points_this_step)
+        return
+
+    def _update_rich_rewards(self, points_this_step):
         """
         This implemenation of a reward function promises rewards after
         each round (i.e. consecutive steps of all 4 players).
@@ -184,6 +192,9 @@ class Env():
         # update nstep counter
         self.nstep = (self.nstep+1)%4
         return
+
+    def _update_sparse_rewards(self, points_this_step):
+        raise NotImplementedError("TODO")
 
     def _cards_to_vec(self, cards):
         vec = np.zeros(len(self.all_cards), int)
