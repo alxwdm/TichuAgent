@@ -7,6 +7,10 @@ from env.deck import Deck
 from env.player import Player
 from env.stack import Stack
 
+# A thresholdo of 90 means that Tichu is
+# called in about 30 % of all games
+TICHU_THRESHOLD = 90 
+
 class Game():
 
     def __init__(self, verbose=0):
@@ -39,6 +43,21 @@ class Game():
         self.players_finished = list()
         self.pass_counter = 0
         self.game_finished = False
+
+        # Tichu routine: Call Tichu if rating is high enough
+        # and teammate has not called Tichu
+        tichu_threshold = TICHU_THRESHOLD
+        for i in range(4):
+            player_idx = (self.active_player+i)%4
+            teammate_idx = self._get_teammate(player_idx)
+            if self.players[teammate_idx].tichu_flag:
+                pass
+            elif self.players[player_idx].hand_rating > tichu_threshold:
+                self.players[player_idx].call_tichu()
+                if verbose > 0:
+                    print('Player {} called Tichu!'.format(player_idx))
+            else:
+                pass
 
     def step(self, player_id, cards):
         points_this_step = [0, 0, 0, 0]
@@ -140,7 +159,7 @@ class Game():
                         self.game_finished = True
                     # if player called tichu and finished, check if tichu is successfull
                     if self.players[player_id].tichu_flag:
-                        if len(self.players_finished == 1):
+                        if len(self.players_finished) == 1:
                             self.players[player_id].add_points(100)
                             points_this_step[player_id] += 100
                             if self.verbose > 0:
