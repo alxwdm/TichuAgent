@@ -87,7 +87,8 @@ def play_greedy_game(verbose=True):
         my_state = state[active_player]
         action = agent.act(my_state)
         last_active = active_player
-        cummulative_reward[active_player] += rewards[active_player]
+        if not env.game.players[active_player].finished:
+            cummulative_reward[active_player] += rewards[active_player]
         state, rewards, done, active_player = env.step(active_player, action)
         new_active = active_player
         if last_active == new_active:
@@ -95,6 +96,8 @@ def play_greedy_game(verbose=True):
         else:
              conseq_active_counter = 0
         if done:
+            if verbose:
+                print('-----')
             for i in range(4):
                cummulative_reward[i] += rewards[i]
                if verbose:
