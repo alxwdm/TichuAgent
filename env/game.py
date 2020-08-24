@@ -166,6 +166,9 @@ class Game():
                     # regular game end
                     if len(self.players_finished) == 3:
                         self.game_finished = True
+                        # if last stack is dragon stack
+                        if self.stack.dragon_flag:
+                            points_this_step = self._dragon_stack() 
                         # get first and last finisher
                         first = self.players_finished[0]
                         for i in range(4):
@@ -204,6 +207,7 @@ class Game():
                         #    self.players[last].add_points(-100)
                         #    points_this_step[last] -= 100
                     if self.game_finished == True and self.verbose > 0:
+                        print('-----')
                         print('Game is finished!')
                         print('Score of player 0 and player 2: {0}'.format(
                             (self.players[0].points + self.players[2].points)))
