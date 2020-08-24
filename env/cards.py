@@ -17,22 +17,19 @@ class Cards():
     phoenix_flag = None
 
     def __init__(self, card_list):
-
         self.phoenix_flag = False
-
         self.cards = list()
         for i in card_list:
             self.cards.append(i)
             if i.name == 'Phoenix':
                 self.phoenix_flag = True
         self.cards.sort()
-
         self.size = len(self.cards)
-
         self._set_type_and_power()
         self._set_points()
 
     # a nice visualization of all cards in the set
+    # (depending on the device, card.image might need to be adapted)
     def show(self):
         if self.size == 0:
             print('  PASS')
@@ -55,7 +52,6 @@ class Cards():
         card_set.sort()
         phoenix_flag = self.phoenix_flag
         self.type = 'unk'
-
         # pass
         if len(card_set)==0:
             self.type = 'pass'
@@ -139,15 +135,15 @@ class Cards():
                 self.type = 'straight'
                 self.power = card_set[-1].power
                 return
-            # phoneix straight
+            # phoenix straight
             if phoenix_flag:
                 phoenix_used = False
                 phoenix_idx = -1
                 is_straight = True
                 for i in range(len(card_set)-2):
-                    if card_set[i+1].power + 1 == card_set[i+2].power:
+                    if card_set[i+1].power+1 == card_set[i+2].power:
                         pass
-                    elif not(phoenix_used) and (card_set[i+1].power + 2 == card_set[i+2].power):
+                    elif not(phoenix_used) and (card_set[i+1].power+2 == card_set[i+2].power):
                         phoenix_used = True
                         phoenix_idx = i+1
                     else:
@@ -161,7 +157,7 @@ class Cards():
                         self.power = card_set[-1].power
                     return
         # pair sequence
-        if len(card_set) >= 4 and len(card_set) % 2 == 0 and not(any((crd.name == 'Dog' or crd.name == 'Dragon') for crd in card_set)):
+        if len(card_set)>=4 and len(card_set)%2==0 and not(any((crd.name == 'Dog' or crd.name == 'Dragon') for crd in card_set)):
             is_pair_regular = True
             for i in range(len(card_set)-1):
                 if i % 2 == 0 and card_set[i].power == card_set[i+1].power:
