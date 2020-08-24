@@ -31,8 +31,11 @@ def play_dumb_game(max_steps=1000, verbose=1):
     while game_active:
         active_player = game.active_player
         leading_player = game.leading_player
+        # pass if player has already finsihed
+        if game.players[active_player].has_finished():
+            suc, _ = game.step(active_player, Cards([]))
         # make a random move if stack is empty
-        if not(game.stack.cards) and not(game.players[active_player].has_finished()):
+        elif not(game.stack.cards):
             comb = game.players[active_player].random_move()
             suc, _ = game.step(active_player, comb)
         # try to make a matching move if opponent is leading
