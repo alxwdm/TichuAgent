@@ -62,7 +62,6 @@ class Card():
         else:
             self.image = ['┍┄┄┄┑', '┆ '+self.name+'   ┆', '┆  '+SUITS[self.suit]+'  ┆', '┆   '+self.name+' ┆', '┖┄┄┄┚']
 
-
     def __ge__(self, other):
         return self.power >= other.power
 
