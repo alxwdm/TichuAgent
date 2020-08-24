@@ -85,7 +85,6 @@ class Player():
                       'straight': 5,
                       'straight_bomb': 6,
                       'pair_seq': 7}
-
         bombs = ['four_bomb', 'straight_bomb']
         # initialize cards and score
         cards = self.hand

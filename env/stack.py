@@ -41,7 +41,7 @@ class Stack():
             self.cards.append(cards_to_add)
             self._update()
             return True
-        # if stack contains cards, must be same type and higher power
+        # if stack contains cards, cards_to_add must be same type and higher power
         elif self.type == cards_to_add.type and self.power < cards_to_add.power:
             # for straight and pair_seq, equal lengths are required
             if self.type == 'straight' and not(self.cards[-1].size == cards_to_add.size):

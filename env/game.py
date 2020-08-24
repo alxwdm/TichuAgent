@@ -14,14 +14,11 @@ TICHU_THRESHOLD = 90
 class Game():
 
     def __init__(self, verbose=0):
-
         # Create deck and distribute
         deck = Deck()
         sets = deck.shuffle_and_deal()
-
         # Set verbosity
         self.verbose = verbose
-
         # Create players and assign hands
         self.players = list()
         for i in range(4):
@@ -31,10 +28,8 @@ class Game():
             if self.verbose > 0:
                 print('Player {0} hand (rating: {1}) is:'.format(i, rating))
                 self.players[i].hand.show()
-
         # Create empty stack
         self.stack = Stack()
-
         # Game managing parameter
         for i in range(4):
             for crd in self.players[i].hand.cards:
@@ -44,9 +39,10 @@ class Game():
         self.players_finished = list()
         self.pass_counter = 0
         self.game_finished = False
-
-        # Tichu routine: Call Tichu if rating is high enough
-        # and teammate has not called Tichu
+        # Start Tichu routine, starting from active player 
+        # Tichu is called if:
+        # - hand rating is high enough (i.e. above TICHU_THRESHOLD)
+        # - teammate has not called Tichu yet 
         self.tichu_points = [0, 0, 0, 0]
         tichu_threshold = TICHU_THRESHOLD
         for i in range(4):
@@ -62,6 +58,13 @@ class Game():
                 pass
 
     def step(self, player_id, cards):
+        """
+        This function manages a game step:
+        - adds cards to stack (if move is valid)
+        - assigns stack points to players who won it
+        - iterates active player token
+        - checks if game is finished
+        """
         points_this_step = [0, 0, 0, 0]
         if not(player_id == self.active_player):
             if self.verbose > 0:
@@ -108,6 +111,7 @@ class Game():
             # try to add cards to current stack
             suc2 = self.stack.add(cards)
             if suc1 and suc2:
+                # determine next active player
                 if cards.cards[0].name == 'Dog':
                     teammate = self._get_teammate(player_id)
                     if not(teammate in self.players_finished):
@@ -127,14 +131,14 @@ class Game():
                     self.leading_player = player_id
                     self.active_player = (player_id+1)%4 
                 suc = self.players[player_id].remove_cards(cards)
-                if not(suc): # This should never happen
+                if not(suc): # This should never happen!
                     print('Could not remove players cards.')
                     return
                 self.pass_counter = 0
                 if self.verbose > 0:
                     print('Player {0} plays {1}.'.format(player_id, cards.type))
                     cards.show()
-                # check if player has finished
+                # check if player and game is finished
                 if self.players[player_id].finished:
                     if self.verbose > 0:
                         print('Player {0} has finished on position {1}!'.format(
@@ -142,8 +146,7 @@ class Game():
                     self.players_finished.append(player_id)
                     if not(cards.cards[0].name == 'Dog'):
                         self.active_player = (player_id+1)%4
-                    # check if game has finished
-                    # double-team victory, game is finished and points by cards are discarded
+                    # check if double-team victory (stack points do not count)
                     if len(self.players_finished) == 2 and sum(self.players_finished)%2 == 0:
                         if self.verbose > 0:
                             print('Double team victory by players {0} and {1}!'.format(
@@ -163,7 +166,7 @@ class Game():
                         points_this_step[opponents[0]] = 0
                         points_this_step[opponents[1]] = 0
                         self.game_finished = True
-                    # regular game end
+                    # check if regular game end
                     if len(self.players_finished) == 3:
                         self.game_finished = True
                         # if last stack is dragon stack
@@ -202,10 +205,6 @@ class Game():
                                     print('Tichu by player {0} was not successfull!'.format(i))
                             # undo Tichu flag (to avoid points are added more than once)
                             self.players[i].tichu_flag = False
-                        # if remaining player called tichu -> tichu failed
-                        #if self.players[last].tichu_flag:
-                        #    self.players[last].add_points(-100)
-                        #    points_this_step[last] -= 100
                     if self.game_finished == True and self.verbose > 0:
                         print('-----')
                         print('Game is finished!')
@@ -251,7 +250,13 @@ class Game():
             return 1
 
     def _dragon_stack(self):
-        # give dragon stack to opponent player according to a simple heuristic
+        """
+        According to game rules, a stack with a Dragon must be given to opposing team.
+        Here, this is determined automatically by a simple heuristic:
+        - If any opponent player has called Tichu, give the Dragon stack to the other player
+        - Else, give Dragon stack to the opponent with the most hand cards.
+        This is reasonable, because the Dragon stack can be reobtained if opponent finishes last.
+        """
         # determine opponents
         opponents = self._get_opponents()
         points_this_step = [0, 0, 0, 0]
@@ -268,7 +273,7 @@ class Game():
             if self.verbose > 0:
                 print('Player {0} gave dragon stack to player {1}'.format(
                     self.leading_player, opponents[0]))
-        # if no tichu called by opposite team, give dragon to player with more hand cards
+        # if no tichu called by opposite team, give dragon to opponent with more hand cards
         elif self.players[opponents[0]].hand_size < self.players[opponents[1]].hand_size:
             self.players[opponents[1]].add_points(self.stack.points)
             points_this_step[opponents[1]] = self.stack.points
