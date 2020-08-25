@@ -31,10 +31,10 @@ CARD_VALUES = {'2': 2,
 class Card():
 
     def __init__(self, name=None, suit=None):
-    	
+
         self.name = name
         self.suit = suit
-        self.special_card = 'Special' == suit
+        self.special_card = (suit == 'Special')
         self.power = CARD_VALUES[self.name]
         self.points = 0
 
@@ -46,28 +46,28 @@ class Card():
         elif self.name == 'Dragon':
             self.points = 25
         elif self.name == 'Phoenix':
-        	self.points = -25
+            self.points = -25
 
         # card image is used for visualization
         if name == '10':
-            self.image = ['┍┄┄┄┑', '┆'+self.name+'   ┆', 
-                         '┆  '+SUITS[self.suit]+'  ┆', '┆   '+self.name+'┆', 
+            self.image = ['┍┄┄┄┑', '┆'+self.name+'   ┆',
+                         '┆  '+SUITS[self.suit]+'  ┆', '┆   '+self.name+'┆',
                          '┖┄┄┄┚']
         elif name == 'Dragon':
-          self.image = ['┍┄┄┄┑', '┆ '+'Dr'+'  ┆', 
-                        '┆ '+'ag'+'  ┆', '┆ '+'on'+'  ┆', '┖┄┄┄┚']
+            self.image = ['┍┄┄┄┑', '┆ '+'Dr'+'  ┆',
+                          '┆ '+'ag'+'  ┆', '┆ '+'on'+'  ┆', '┖┄┄┄┚']
         elif name == 'Phoenix':
-            self.image = ['┍┄┄┄┑', '┆ '+'Ph'+'  ┆', 
+            self.image = ['┍┄┄┄┑', '┆ '+'Ph'+'  ┆',
                           '┆ '+'oe'+'  ┆', '┆ '+'nix'+' ┆', '┖┄┄┄┚']
-        elif name == 'Dog': 
-            self.image = ['┍┄┄┄┑', '┆'+' '+'    ┆', '┆ '+'Dog'+' ┆', 
+        elif name == 'Dog':
+            self.image = ['┍┄┄┄┑', '┆'+' '+'    ┆', '┆ '+'Dog'+' ┆',
                           '┆ '+' '+'   ┆', '┖┄┄┄┚']
-        elif name == 'Majong':   
-            self.image = ['┍┄┄┄┑', '┆'+' '+'    ┆', '┆  '+'1'+'  ┆', 
+        elif name == 'Majong':
+            self.image = ['┍┄┄┄┑', '┆'+' '+'    ┆', '┆  '+'1'+'  ┆',
                           '┆  '+' '+'  ┆', '┖┄┄┄┚']
         else:
-            self.image = ['┍┄┄┄┑', '┆ '+self.name+'   ┆', 
-                          '┆  '+SUITS[self.suit]+'  ┆', '┆   '+self.name+' ┆', 
+            self.image = ['┍┄┄┄┑', '┆ '+self.name+'   ┆',
+                          '┆  '+SUITS[self.suit]+'  ┆', '┆   '+self.name+' ┆',
                           '┖┄┄┄┚']
 
     def __ge__(self, other):
@@ -89,8 +89,8 @@ class Card():
             return self.name == other.name
 
     def __ne__(self, other):
-        return self.power != other.power   
-    
+        return self.power != other.power
+
     def __hash__(self):
         card_hash = hashlib.md5()
         card_hash.update(self.__repr__().encode())

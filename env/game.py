@@ -22,7 +22,7 @@ class Game():
         # Create players and assign hands
         self.players = list()
         for i in range(4):
-            self.players.append(Player(id=i))
+            self.players.append(Player())
             self.players[i].assign_hand(sets[i])
             rating = self.players[i].hand_rating
             if self.verbose > 0:

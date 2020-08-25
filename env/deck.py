@@ -73,25 +73,25 @@ class Deck():
         Hrt_A = Card(name='A', suit='Heart')
         Dia_A = Card(name='A', suit='Dia')
         Clb_A = Card(name='A', suit='Club')
-        
+
         Majong = Card(name='Majong', suit='Special')
         Dragon = Card(name='Dragon', suit='Special')
         Phoenix = Card(name='Phoenix', suit='Special')
         Dog = Card(name='Dog', suit='Special')
 
-        self.all_cards = [Spd_2 , Hrt_2 , Dia_2 , Clb_2 ,    
-                          Spd_3 , Hrt_3 , Dia_3 , Clb_3 ,
-                          Spd_4 , Hrt_4 , Dia_4 , Clb_4 ,
-                          Spd_5 , Hrt_5 , Dia_5 , Clb_5 , 
-                          Spd_6 , Hrt_6 , Dia_6 , Clb_6 , 
-                          Spd_7 , Hrt_7 , Dia_7 , Clb_7 , 
-                          Spd_8 , Hrt_8 , Dia_8 , Clb_8 ,
-                          Spd_9 , Hrt_9 , Dia_9 , Clb_9 ,
-                          Spd_10 , Hrt_10 , Dia_10 , Clb_10 ,
-                          Spd_J , Hrt_J , Dia_J , Clb_J ,
-                          Spd_Q , Hrt_Q , Dia_Q , Clb_Q ,
-                          Spd_K , Hrt_K , Dia_K , Clb_K ,
-                          Spd_A , Hrt_A , Dia_A , Clb_A,
+        self.all_cards = [Spd_2, Hrt_2, Dia_2, Clb_2,
+                          Spd_3, Hrt_3, Dia_3, Clb_3,
+                          Spd_4, Hrt_4, Dia_4, Clb_4,
+                          Spd_5, Hrt_5, Dia_5, Clb_5,
+                          Spd_6, Hrt_6, Dia_6, Clb_6,
+                          Spd_7, Hrt_7, Dia_7, Clb_7,
+                          Spd_8, Hrt_8, Dia_8, Clb_8,
+                          Spd_9, Hrt_9, Dia_9, Clb_9,
+                          Spd_10, Hrt_10, Dia_10, Clb_10,
+                          Spd_J, Hrt_J, Dia_J, Clb_J,
+                          Spd_Q, Hrt_Q, Dia_Q, Clb_Q,
+                          Spd_K, Hrt_K, Dia_K, Clb_K,
+                          Spd_A, Hrt_A, Dia_A, Clb_A,
                           Phoenix, Dragon, Majong, Dog]
         self.size = len(self.all_cards)
 
@@ -104,4 +104,3 @@ class Deck():
         set_2 = Cards(card_list=all_cards[2*chunk_size:3*chunk_size])
         set_3 = Cards(card_list=all_cards[3*chunk_size:])
         return [set_0, set_1, set_2, set_3]
-       

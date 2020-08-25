@@ -1,13 +1,11 @@
 # Stack class for Python Implementation of Tichu
 
-from env.cards import Cards
-
 BOMBS = ['four_bomb', 'straight_bomb']
 
 class Stack():
 
     def __init__(self):
-        
+
         self.cards = list()
         self.points = 0
         self.power = 0
@@ -37,21 +35,21 @@ class Stack():
     def add(self, cards_to_add):
         # add cards to stack according to game rules
         # all but hand and pass can be played on empty stack
-        if (not(self.cards) and 
-              cards_to_add.type != 'hand' and 
+        if (not(self.cards) and
+              cards_to_add.type != 'hand' and
               cards_to_add.type != 'pass'):
             self.cards.append(cards_to_add)
             self._update()
             return True
         # if stack not empty, cards_to_add must be same type and higher power
-        elif (self.type == cards_to_add.type 
+        elif (self.type == cards_to_add.type
               and self.power < cards_to_add.power):
             # for straight and pair_seq, equal lengths are required
-            if (self.type == 'straight' and 
-                  not(self.cards[-1].size == cards_to_add.size)):
+            if (self.type == 'straight' and
+                  not self.cards[-1].size == cards_to_add.size):
                 return False
-            elif (self.type == 'pair_seq' and 
-                  not(self.cards[-1].size == cards_to_add.size)):
+            elif (self.type == 'pair_seq' and
+                  not self.cards[-1].size == cards_to_add.size):
                 return False
             # Dog can only be played as first card
             elif cards_to_add.cards[0].name == 'Dog':
@@ -62,39 +60,39 @@ class Stack():
                 self._update()
                 return True
         # special moves: Phoenix can be played on solo (except Dragon)
-        elif (self.type == 'solo' and 
-              cards_to_add.type == 'solo' and 
-              cards_to_add.phoenix_flag and 
+        elif (self.type == 'solo' and
+              cards_to_add.type == 'solo' and
+              cards_to_add.phoenix_flag and
               self.power < 15):
             old_power = self.power
             self.cards.append(cards_to_add)
             self._update()
-            self.power = old_power + 0.5           
-            return True   
-        # bombs can be played any time 
+            self.power = old_power + 0.5
+            return True
+        # bombs can be played any time
         elif cards_to_add.type in BOMBS and self.power < cards_to_add.power:
             self.cards.append(cards_to_add)
-            self._update()      
+            self._update()
             return True
         # illegal move
         else:
-            return False 
+            return False
 
     # check if new_cards is a valid move on old_cards
     @staticmethod
     def check_valid_move(old_cards, new_cards):
         if not(old_cards) and new_cards.type != 'hand':
             return True
-        elif (old_cards.type == new_cards.type and 
+        elif (old_cards.type == new_cards.type and
               old_cards.power < new_cards.power):
-            if (old_cards.type == 'straight' and 
-                  not(len(old_cards.cards) == len(new_cards.cards))):
+            if (old_cards.type == 'straight' and
+                  not len(old_cards.cards) == len(new_cards.cards)):
                 return False
             else:
                 return True
-        elif (old_cards.type == 'solo' and new_cards.type == 'solo' and 
+        elif (old_cards.type == 'solo' and new_cards.type == 'solo' and
               new_cards.phoenix_flag and old_cards.power < 15):
-            return True 
+            return True
         elif new_cards.type in BOMBS and old_cards.power < new_cards.power:
             return True
         else:
