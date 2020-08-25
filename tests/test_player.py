@@ -4,9 +4,6 @@ import pytest
 
 from env.cards import Cards
 
-def test_id(player_0):
-    assert player_0.id == 0
-
 def test_assign(player_0, hand_0):
     assert player_0.assign_hand(hand_0) == True
     assert player_0.hand_power == 0

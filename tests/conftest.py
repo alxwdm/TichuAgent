@@ -398,8 +398,8 @@ def ps_5(Clb_2, Phoenix, Spd_2, Hrt_4):
 
 @pytest.fixture(scope='session', autouse='True')
 def player_0():
-    return Player(id=0)
+    return Player()
 
 @pytest.fixture(scope='session', autouse='True')
 def player_1():
-    return Player(id=1)
+    return Player()
