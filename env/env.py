@@ -118,7 +118,8 @@ class Env():
                 hand_size = self.game.players[pid].hand_size
                 tichu_flag = int(self.game.players[pid].tichu_flag)
                 if pid == this_player:
-                    player_cards = self._cards_to_vec(self.game.players[pid].hand)
+                    player_cards = self._cards_to_vec(
+                        self.game.players[pid].hand)
                 else:
                     player_cards = np.zeros(len(self.all_cards), int).tolist()
                 player_state.append([hand_size, tichu_flag, player_cards])
@@ -136,7 +137,8 @@ class Env():
                 hand_size = self.game.players[pid].hand_size
                 tichu_flag = int(self.game.players[pid].tichu_flag)
                 if pid == this_player:
-                    player_cards = self._cards_to_vec(self.game.players[pid].hand)
+                    player_cards = self._cards_to_vec(
+                        self.game.players[pid].hand)
                 else:
                     player_cards = self.action_buffer[pid]
                 player_state.append([hand_size, tichu_flag, player_cards])
@@ -145,7 +147,7 @@ class Env():
 
     def _reset_action_buffer(self):
         for i in range(4):
-            self.action_buffer[i] = np.zeros(len(self.all_cards), int).tolist()
+            self.action_buffer[i] = np.zeros(len(self.all_cards),int).tolist()
         return
 
     def _update_action_buffer(self, player_id, action):
@@ -168,13 +170,14 @@ class Env():
         If a player or its teammate (!) gets points during a round 
         (e.g. by winning a stack), it gets a reward in the amount of 
         the points in this round.
-        The benefit of this reward function is that each step promises a reward
-        (i.e. no sparse rewards that may impede learning).
-        The danger is that the actual points are assigned at the end of a game, 
-        which means the last player looses all its points to the first finisher.
-        This may lead to a non-ideal game strategy, where lots of rewards might 
-        be collected during the game, but actually the game is lost if the player 
-        does not finish early.
+        The benefit of this reward function is that each step promises a 
+        reward (i.e. no sparse rewards that may impede learning).
+        The danger is that the actual points are assigned at the end of a 
+        game, which means the last player looses all its points to the 
+        first finisher.
+        This may lead to a non-ideal game strategy, where lots of 
+        rewards might be collected during the game, but actually the game is 
+        lost if the player does not finish early.
         Also, cummulative reward is higher for players that finish later.
         However, if the winning team gets more cumulative reward, then this
         reward design will still lead to a good policy.
