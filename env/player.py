@@ -47,7 +47,7 @@ class Player():
         available_comb = self.hand.get_available_combinations()
         flattened = [item for sublist in available_comb for item in sublist]
         random_comb = random.choice(flattened)
-        suc = self.move(random_comb) # just re-check, should always return True
+        suc = self.move(random_comb) # double-check, should always return True
         if suc:
             return random_comb
 
@@ -90,13 +90,15 @@ class Player():
         cards = self.hand
         score = 0
         # update score based on individual cards
-        good_cards_list = [elem for elem in cards.cards if elem.name in good_cards]
+        good_cards_list = [elem for elem in cards.cards 
+                            if elem.name in good_cards]
         for crd in good_cards_list:
             if crd.name == 'Dragon' or crd.name == 'A':
                 score += 20
             else:
                 score += 10
-        bad_cards_list = [elem for elem in cards.cards if elem.name in bad_cards]
+        bad_cards_list = [elem for elem in cards.cards 
+                            if elem.name in bad_cards]
         if bad_cards_list:
             score -= 40
         # update score based on combinations
@@ -119,7 +121,9 @@ class Player():
             score += max_fulls
         triples = avail_combs[comb_types['triple']]
         if triples:
-            max_triple = sum([triple.power for triple in triples])/len(triples)
+            max_triple = sum(
+                            [triple.power for triple in triples]
+                            )/len(triples)
             score += max_triple
         solos = avail_combs[comb_types['solo']]
         straights = avail_combs[comb_types['straight']]

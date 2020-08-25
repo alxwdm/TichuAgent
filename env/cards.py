@@ -75,7 +75,8 @@ class Cards():
                 return
         # triple
         if len(card_set)==3:
-            if card_set[0].power == card_set[1].power and card_set[1].power == card_set[2].power:
+            if (card_set[0].power == card_set[1].power and 
+                card_set[1].power == card_set[2].power):
                 self.type = 'triple'
                 self.power = card_set[0].power
                 return
@@ -85,32 +86,42 @@ class Cards():
                 self.power = card_set[1].power
                 return
         # four (BOMB)
-        if len(card_set)==4 and card_set[0].power == card_set[1].power and card_set[1].power == card_set[2].power and card_set[2].power == card_set[3].power:
+        if (len(card_set)==4 and card_set[0].power == card_set[1].power and 
+            card_set[1].power == card_set[2].power and 
+            card_set[2].power == card_set[3].power):
             self.type = 'four_bomb'
             self.power = 50 + card_set[0].power
             return
         # full house 
         if len(card_set)==5:
-            if card_set[0].power == card_set[1].power and card_set[1].power == card_set[2].power and card_set[3].power == card_set[4].power:
+            if (card_set[0].power == card_set[1].power and 
+                  card_set[1].power == card_set[2].power and 
+                  card_set[3].power == card_set[4].power):
                 self.type = 'full'
                 self.power = card_set[0].power
                 return
-            elif card_set[0].power == card_set[1].power and card_set[2].power == card_set[3].power and card_set[3].power == card_set[4].power:
+            elif (card_set[0].power == card_set[1].power and 
+                    card_set[2].power == card_set[3].power and 
+                    card_set[3].power == card_set[4].power):
                 self.type = 'full'
                 self.power = card_set[2].power
                 return
             # phoenix full house with phoenix triple
-            elif phoenix_flag and card_set[1].power == card_set[2].power and card_set[3].power == card_set[4].power:
+            elif (phoenix_flag and 
+                    card_set[1].power == card_set[2].power and 
+                    card_set[3].power == card_set[4].power):
                 self.type = 'full'
                 self.power = card_set[3].power
                 return
             # phoenix full house with phoenix pair
             elif phoenix_flag:
-                if card_set[1].power == card_set[2].power and card_set[2].power == card_set[3].power:
+                if (card_set[1].power == card_set[2].power and 
+                      card_set[2].power == card_set[3].power):
                     self.type = 'full'
                     self.power = card_set[1].power
                     return
-                elif card_set[2].power == card_set[3].power and card_set[3].power == card_set[4].power:
+                elif (card_set[2].power == card_set[3].power and 
+                      card_set[3].power == card_set[4].power):
                     self.type = 'full'
                     self.power = card_set[2].power
                     return
@@ -143,7 +154,8 @@ class Cards():
                 for i in range(len(card_set)-2):
                     if card_set[i+1].power+1 == card_set[i+2].power:
                         pass
-                    elif not(phoenix_used) and (card_set[i+1].power+2 == card_set[i+2].power):
+                    elif (not(phoenix_used) and 
+                         (card_set[i+1].power+2 == card_set[i+2].power)):
                         phoenix_used = True
                         phoenix_idx = i+1
                     else:
@@ -157,12 +169,14 @@ class Cards():
                         self.power = card_set[-1].power
                     return
         # pair sequence
-        if len(card_set)>=4 and len(card_set)%2==0 and not(any((crd.name == 'Dog' or crd.name == 'Dragon') for crd in card_set)):
+        if (len(card_set)>=4 and len(card_set)%2==0 and 
+            not(any((crd.name == 'Dog' or crd.name == 'Dragon') 
+                for crd in card_set))):
             is_pair_regular = True
             for i in range(len(card_set)-1):
-                if i % 2 == 0 and card_set[i].power == card_set[i+1].power:
+                if i%2 == 0 and card_set[i].power == card_set[i+1].power:
                     pass
-                elif i % 2 == 1 and card_set[i].power + 1 == card_set[i+1].power:
+                elif i%2 == 1 and card_set[i].power+1 == card_set[i+1].power:
                     pass
                 else:
                     is_pair_regular = False
@@ -176,7 +190,8 @@ class Cards():
                 # first, check if it is an increasing by +1 sequence
                 unique_power = sorted(set([crd.power for crd in card_set]))
                 unique_power.pop(0) # remove phoenix
-                if all(x+1==y for x, y in zip(unique_power, unique_power[1:])) and len(unique_power)>1:
+                if (all(x+1==y for x, y in zip(unique_power, unique_power[1:])
+                      ) and len(unique_power)>1):
                     phoenix_used = False
                     is_pair_equal = True
                     is_pair_unequal = True
@@ -184,29 +199,33 @@ class Cards():
                     toggle = 1
                     antitoggle = 0
                     for i in range(1,len(card_set)-1):
-                        if i % 2 == toggle and card_set[i].power == card_set[i+1].power:
+                        if (i%2 == toggle and 
+                              card_set[i].power == card_set[i+1].power):
                             pass
-                        elif i % 2 == antitoggle and card_set[i].power + 1 == card_set[i+1].power:
+                        elif (i%2 == antitoggle and 
+                              card_set[i].power + 1 == card_set[i+1].power):
                             if i+1 >= len(card_set)-1 and not(phoenix_used):
-                                # phoenix is used as the highest pair of sequence
+                                # phoenix used as the highest pair of sequence
                                 phoenix_used = True
                         elif phoenix_used: # phoenix cannot be used twice
                             is_pair_unequal = False
                             break
                         else:
                             # phoenix is used in the middle of the sequence 
-                            # -> set consequence of i % 2 accordingly by toggling 1 and 0
+                            # toggle 1 and 0 so that i%2 matches next element
                             phoenix_used = True
                             toggle = 0
                             antitoggle = 1
-                    # check for phoenix use in 'equal' index (only if unequal is False)
+                    # check for phoenix use in 'equal' index
                     if not(is_pair_unequal):
                         phoenix_used = False
                         for i in range(1,len(card_set)-1):
-                            if i % 2 == 0 and card_set[i].power == card_set[i+1].power:
+                            if (i%2 == 0 and 
+                                  card_set[i].power == card_set[i+1].power):
                                 pass
-                            elif i % 2 == 1 and card_set[i].power + 1 == card_set[i+1].power:
-                                # check if phoenix is used as first card of the sequence
+                            elif (i%2 == 1 and 
+                                  card_set[i].power+1 == card_set[i+1].power):
+                                # check if phoenix is first card in sequence
                                 if i == 1:
                                     phoenix_used = True
                             elif phoenix_used: # phoenix cannot be used twice
@@ -275,7 +294,8 @@ class Cards():
         # triple
         for i in range(len(self.cards)-2):
             # regular triple
-            if all_cards[i].power == all_cards[i+1].power and all_cards[i+1].power == all_cards[i+2].power:
+            if (all_cards[i].power == all_cards[i+1].power and 
+                all_cards[i+1].power == all_cards[i+2].power):
                 triple_list = [all_cards[i], all_cards[i+1], all_cards[i+2]]
                 triple_cards = Cards(triple_list)
                 if triple_cards.type == 'triple':
@@ -288,23 +308,31 @@ class Cards():
                     triple.append(triple_cards)
             # multiple triples
             try:
-                if all_cards[i].power == all_cards[i+1].power and all_cards[i+1].power == all_cards[i+3].power:
-                    triple_list = [all_cards[i], all_cards[i+1], all_cards[i+3]]
+                if (all_cards[i].power == all_cards[i+1].power and 
+                      all_cards[i+1].power == all_cards[i+3].power):
+                    triple_list = [all_cards[i], all_cards[i+1], 
+                                   all_cards[i+3]]
                     triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
-                if all_cards[i].power == all_cards[i+2].power and all_cards[i+2].power == all_cards[i+3].power:
-                    triple_list = [all_cards[i], all_cards[i+2], all_cards[i+3]]
+                if (all_cards[i].power == all_cards[i+2].power and 
+                      all_cards[i+2].power == all_cards[i+3].power):
+                    triple_list = [all_cards[i], all_cards[i+2], 
+                                   all_cards[i+3]]
                     triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
-                if phoenix_flag and all_cards[i+1].power == all_cards[i+3].power:
-                    triple_list = [all_cards[0], all_cards[i+1], all_cards[i+3]]
+                if (phoenix_flag and 
+                      all_cards[i+1].power == all_cards[i+3].power):
+                    triple_list = [all_cards[0], all_cards[i+1], 
+                                   all_cards[i+3]]
                     triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
-                if phoenix_flag and all_cards[i+1].power == all_cards[i+4].power:
-                    triple_list = [all_cards[0], all_cards[i+1], all_cards[i+4]]
+                if (phoenix_flag and 
+                      all_cards[i+1].power == all_cards[i+4].power):
+                    triple_list = [all_cards[0], all_cards[i+1], 
+                                   all_cards[i+4]]
                     triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
@@ -312,8 +340,11 @@ class Cards():
                 pass
         # four
         for i in range(len(self.cards)-3):
-            if all_cards[i].power == all_cards[i+1].power and all_cards[i+1].power == all_cards[i+2].power and all_cards[i+2].power == all_cards[i+3].power:
-                four_list = [all_cards[i], all_cards[i+1], all_cards[i+2], all_cards[i+3]]
+            if (all_cards[i].power == all_cards[i+1].power and 
+                  all_cards[i+1].power == all_cards[i+2].power and 
+                  all_cards[i+2].power == all_cards[i+3].power):
+                four_list = [all_cards[i], all_cards[i+1], 
+                             all_cards[i+2], all_cards[i+3]]
                 four_cards = Cards(four_list)
                 if four_cards.type == 'four_bomb':
                     four_bomb.append(four_cards)
@@ -391,7 +422,8 @@ class Cards():
                 # break if no pair_seq possible
                 else:
                     break
-        return [solo, pair, triple, four_bomb, full, straight, straight_bomb, pair_seq]
+        return [solo, pair, triple, four_bomb, 
+                full, straight, straight_bomb, pair_seq]
 
 
     # check if this Cards obj contains all cards from other Cards obj
@@ -429,7 +461,10 @@ class Cards():
 
     def __ge__(self, other):
         # equal types or bombs, compare power
-        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS: 
+        if ((self.type == other.type and 
+            self.size == other.size) or 
+            self.type in BOMBS or 
+            other.type in BOMBS): 
             return self.power >= other.power
         # unequal types, return False (opt: raise error)
         else: 
@@ -437,7 +472,10 @@ class Cards():
 
     def __le__(self, other):
         # equal types or bombs, compare power
-        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS:
+        if ((self.type == other.type and 
+            self.size == other.size) or 
+            self.type in BOMBS or 
+            other.type in BOMBS):
             return self.power <= other.power
         # unequal types, return False (opt: raise error)
         else: 
@@ -445,7 +483,10 @@ class Cards():
 
     def __gt__(self, other):
         # equal types or bombs, compare power
-        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS:
+        if ((self.type == other.type and 
+            self.size == other.size) or 
+            self.type in BOMBS or 
+            other.type in BOMBS):
             return self.power > other.power
         # unequal types, return False (opt: raise error)
         else: 
@@ -453,17 +494,24 @@ class Cards():
 
     def __lt__(self, other):
         # equal types or bombs, compare power
-        if (self.type == other.type and self.size == other.size) or self.type in BOMBS or other.type in BOMBS:
+        if ((self.type == other.type and 
+            self.size == other.size) or 
+            self.type in BOMBS or 
+            other.type in BOMBS):
             return self.power < other.power
         # unequal types, return False (opt: raise error)
         else: 
             return False
 
     def __eq__(self, other):
-        return self.type == other.type and self.size == other.size and self.power == other.power
+        return (self.type == other.type and 
+                self.size == other.size and 
+                self.power == other.power)
 
     def __ne__(self, other):
-        return self.type != other.type and self.size != other.size and self.power != other.power
+        return (self.type != other.type and 
+                self.size != other.size and 
+                self.power != other.power)
 
     def __repr__(self):
         card_str = ''

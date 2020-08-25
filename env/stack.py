@@ -37,16 +37,21 @@ class Stack():
     def add(self, cards_to_add):
         # add cards to stack according to game rules
         # all but hand and pass can be played on empty stack
-        if not self.cards and cards_to_add.type != 'hand' and cards_to_add.type != 'pass':
+        if (not(self.cards) and 
+              cards_to_add.type != 'hand' and 
+              cards_to_add.type != 'pass'):
             self.cards.append(cards_to_add)
             self._update()
             return True
-        # if stack contains cards, cards_to_add must be same type and higher power
-        elif self.type == cards_to_add.type and self.power < cards_to_add.power:
+        # if stack not empty, cards_to_add must be same type and higher power
+        elif (self.type == cards_to_add.type 
+              and self.power < cards_to_add.power):
             # for straight and pair_seq, equal lengths are required
-            if self.type == 'straight' and not(self.cards[-1].size == cards_to_add.size):
+            if (self.type == 'straight' and 
+                  not(self.cards[-1].size == cards_to_add.size)):
                 return False
-            elif self.type == 'pair_seq' and not(self.cards[-1].size == cards_to_add.size):
+            elif (self.type == 'pair_seq' and 
+                  not(self.cards[-1].size == cards_to_add.size)):
                 return False
             # Dog can only be played as first card
             elif cards_to_add.cards[0].name == 'Dog':
@@ -57,7 +62,10 @@ class Stack():
                 self._update()
                 return True
         # special moves: Phoenix can be played on solo (except Dragon)
-        elif self.type == 'solo' and cards_to_add.type == 'solo' and cards_to_add.phoenix_flag and self.power < 15:
+        elif (self.type == 'solo' and 
+              cards_to_add.type == 'solo' and 
+              cards_to_add.phoenix_flag and 
+              self.power < 15):
             old_power = self.power
             self.cards.append(cards_to_add)
             self._update()
@@ -77,12 +85,15 @@ class Stack():
     def check_valid_move(old_cards, new_cards):
         if not(old_cards) and new_cards.type != 'hand':
             return True
-        elif old_cards.type == new_cards.type and old_cards.power < new_cards.power:
-            if old_cards.type == 'straight' and not(len(old_cards.cards) == len(new_cards.cards)):
+        elif (old_cards.type == new_cards.type and 
+              old_cards.power < new_cards.power):
+            if (old_cards.type == 'straight' and 
+                  not(len(old_cards.cards) == len(new_cards.cards))):
                 return False
             else:
                 return True
-        elif old_cards.type == 'solo' and new_cards.type == 'solo' and new_cards.phoenix_flag and old_cards.power < 15:
+        elif (old_cards.type == 'solo' and new_cards.type == 'solo' and 
+              new_cards.phoenix_flag and old_cards.power < 15):
             return True 
         elif new_cards.type in BOMBS and old_cards.power < new_cards.power:
             return True
