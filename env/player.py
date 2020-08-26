@@ -83,10 +83,7 @@ class Player():
 
     def move(self, cards):
         """ Returns true if Cards is a valid move. """
-        if self.hand.contains(cards):
-            return True
-        else:
-            return False
+        return bool(self.hand.contains(cards))
 
     def random_move(self):
         """ Randomly play one available combination. """
