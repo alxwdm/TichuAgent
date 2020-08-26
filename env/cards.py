@@ -110,8 +110,8 @@ class Cards():
                 self.power = card_set[0].power
                 return
             # phoenix pair
-            elif (phoenix_flag and 
-                  not (card_set[1].name == 'Dragon' or 
+            elif (phoenix_flag and
+                  not (card_set[1].name == 'Dragon' or
                        card_set[1].name == 'Dog')):
                 self.type = 'pair'
                 self.power = card_set[1].power
@@ -435,7 +435,7 @@ class Cards():
                 elif candidate_list[-1].power == all_cards[j].power:
                     pass
                 # use phoenix mid straight if available
-                elif (phoenix_available and 
+                elif (phoenix_available and
                     candidate_list[-1].power+2 == all_cards[j].power):
                     candidate_list.append(all_cards[0])
                     candidate_list.append(all_cards[j])
