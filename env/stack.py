@@ -6,7 +6,7 @@ class Stack():
 
     Attributes
     ----------
-    cards: list of Cards 
+    cards: list of Cards
       A list of Cards that have been put on the stack.
       The highest combination is the last entry of the list.
     points: int

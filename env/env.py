@@ -32,13 +32,13 @@ class Env():
     [1, 0, 0, 0, 1, 0, ... 0] means play a pair of 2s.
 
     The reward function is designed two ways:
-    
+
     Rich rewards means that a reward can be recieved after each step.
     A step is considered a move by all 4 players.
     In a rich reward setting, the reward is equal to the points
     in a Stack if the Stack is won by either the Player or its teammate.
     The same reward, but negative, is given to the opposing team.
-    For Example: 
+    For Example:
     Player 0 wins a Stack containing 20 points.
     The rewards will be [20, -20, 20, -20] until the next step.
 
@@ -88,8 +88,8 @@ class Env():
     """
 
     def __init__(self, train_mode=True):
-        """ 
-        Constructs a Tichu Environment for RL. 
+        """
+        Constructs a Tichu Environment for RL.
 
         Parameter
         ---------
@@ -127,9 +127,9 @@ class Env():
         return state, rewards, done, active_player
 
     def step(self, player_id, action):
-        """ 
-        Takes a step in the Game. 
-        Updates state, action, rewards, done and returns them. 
+        """
+        Takes a step in the Game.
+        Updates state, action, rewards, done and returns them.
 
         Paramter
         --------
@@ -280,10 +280,10 @@ class Env():
 
     def _update_sparse_rewards(self, points_this_step):
         """
-        Updates the rewards according to a sparse reward function. 
+        Updates the rewards according to a sparse reward function.
 
         Sparse rewards means that rewards are only achived when
-        a Game is completed. 
+        a Game is completed.
         The benefit is that the rewards exactly represent the outcome
         of the Game.
         The danger is that it is hard for an Agent to make sense

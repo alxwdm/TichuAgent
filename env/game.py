@@ -3,7 +3,7 @@ from env.player import Player
 from env.stack import Stack
 
 
-TICHU_THRESHOLD = 90 
+TICHU_THRESHOLD = 90
 # Threshold 90: Tichu is called in roughly 30 % of all games.
 
 class Game():

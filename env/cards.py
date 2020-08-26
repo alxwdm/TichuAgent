@@ -4,13 +4,13 @@ class Cards():
     """
     A class to represent multiple of Tichu Cards.
 
-    Can either be a hand (i.e. no specific combination) 
+    Can either be a hand (i.e. no specific combination)
     or a combination (e.g. pair, straight, ...).
     The type is determined automatically when adding or removing cards.
 
     Inspired by the following sources:
     - https://github.com/hundredblocks/ticher
-    - https://github.com/sylee421/TichuRL    
+    - https://github.com/sylee421/TichuRL
 
     Attributes
     ----------
@@ -21,16 +21,16 @@ class Cards():
     size: int
       The number of Cards in this instance.
     points: int
-      The points of the card. 
+      The points of the card.
       In Tichu, only 5, 10, K, Phoenix and Dragon give points.
     type: str
       The type of this Cards instance (e.g. hand, pair, straight)
     power: float
       The power of this Cards instance. It depends on the type
-      and the highest Card. 
+      and the highest Card.
       For example: A hand has 0 power, a pair of 10s has power 10.
     points: int
-      The aggregated Card points in this instance. 
+      The aggregated Card points in this instance.
 
     Methods
     -------
@@ -39,7 +39,7 @@ class Cards():
     get_available_combinations:
       Outputs a list of all possible combinations.
     contains(other):
-      Checks whether other (list of Card objects) are contained 
+      Checks whether other (list of Card objects) are contained
       in this Cards instance.
     remove(card):
       Removes a Card from this Cards instance.

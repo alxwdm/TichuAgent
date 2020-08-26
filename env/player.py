@@ -6,7 +6,7 @@ class Player():
 
     Attributes
     ----------
-    hand: Cards 
+    hand: Cards
       A Cards instance containing the hand cards of this Player.
     points: int
       The points this Player has achieved so far.
@@ -26,7 +26,7 @@ class Player():
     assign_hand(cards):
       Adds a Cards instance to the Players' hand.
     remove_cards(cards):
-      Removes Cards from Players hand. 
+      Removes Cards from Players hand.
       Returns true if successfull.
     add_points(points):
       Adds points to the points the Players' achived so far.
@@ -76,7 +76,7 @@ class Player():
         self.points += points
 
     def set_points(self, points):
-        """ Sets (overrides) Players' points. """ 
+        """ Sets (overrides) Players' points. """
         self.points = points
 
     def move(self, cards):
@@ -120,7 +120,7 @@ class Player():
         """
         Set hand rating of Players' hand based on a heuristic.
 
-        The hand rating is based on the individual cards 
+        The hand rating is based on the individual cards
         and available combinations of the Players' hand.
         A high rating can be achieved if the Player has
         a lot of high cards (Kings, Aces and Dragon or Phoenix)
