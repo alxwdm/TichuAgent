@@ -65,31 +65,32 @@ class Stack():
 
     def add(self, cards_to_add):
         """ Adds cards to stack according to game rules. """
+        suc = bool()
         # all but hand and pass can be played on empty stack
         if (not(self.cards) and
               cards_to_add.type != 'hand' and
               cards_to_add.type != 'pass'):
             self.cards.append(cards_to_add)
             self._update()
-            return True
+            suc = True
         # if stack not empty, cards_to_add must be same type and higher power
         elif (self.type == cards_to_add.type
               and self.power < cards_to_add.power):
             # for straight and pair_seq, equal lengths are required
             if (self.type == 'straight' and
                   not self.cards[-1].size == cards_to_add.size):
-                return False
+                suc = False
             elif (self.type == 'pair_seq' and
                   not self.cards[-1].size == cards_to_add.size):
-                return False
+                suc = False
             # Dog can only be played as first card
             elif cards_to_add.cards[0].name == 'Dog':
-                return False
+                suc = False
             # append and update stack if successful move
             else:
                 self.cards.append(cards_to_add)
                 self._update()
-                return True
+                suc = True
         # special moves: Phoenix can be played on solo (except Dragon)
         elif (self.type == 'solo' and
               cards_to_add.type == 'solo' and
@@ -99,15 +100,16 @@ class Stack():
             self.cards.append(cards_to_add)
             self._update()
             self.power = old_power + 0.5
-            return True
+            suc = True
         # bombs can be played any time
         elif cards_to_add.type in BOMBS and self.power < cards_to_add.power:
             self.cards.append(cards_to_add)
             self._update()
-            return True
+            suc = True
         # illegal move
         else:
-            return False
+            suc = False
+        return suc
 
     @staticmethod
     def check_valid_move(old_cards, new_cards):
