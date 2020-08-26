@@ -110,7 +110,9 @@ class Cards():
                 self.power = card_set[0].power
                 return
             # phoenix pair
-            elif phoenix_flag and not card_set[1].name == 'Dragon':
+            elif (phoenix_flag and 
+                  not (card_set[1].name == 'Dragon' or 
+                       card_set[1].name == 'Dog')):
                 self.type = 'pair'
                 self.power = card_set[1].power
                 return
@@ -432,7 +434,17 @@ class Cards():
                 # skip pairs
                 elif candidate_list[-1].power == all_cards[j].power:
                     pass
-                # use phoenix if available
+                # use phoenix mid straight if available
+                elif (phoenix_available and 
+                    candidate_list[-1].power+2 == all_cards[j].power):
+                    candidate_list.append(all_cards[0])
+                    candidate_list.append(all_cards[j])
+                    if len(candidate_list) > 4:
+                        straight_cards = Cards(candidate_list)
+                        if straight_cards.type == 'straight':
+                            straight.append(straight_cards)
+                    phoenix_available = False
+                # use phoenix as first/last card if available
                 elif phoenix_available:
                     candidate_list.append(all_cards[0])
                     if len(candidate_list) > 4:
