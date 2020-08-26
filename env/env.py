@@ -114,7 +114,6 @@ class Env():
         self.rewards = [None, None, None, None]
         self.done = False
         self.nstep = 0 # only relevant for rich rewards
-        self.pass_counter = 0 # only relevant for debugging
 
     def reset(self):
         """ Resets the Environment. """
@@ -174,14 +173,6 @@ class Env():
         rewards = self.rewards
         done = self.done
         active_player = self.game.active_player
-        # only for debugging
-        if cards.type == 'pass':
-            self.pass_counter += 1
-            if self.pass_counter >= 10:
-                done = True
-                print('Loop detected, aborting...')
-        else:
-            self.pass_counter = 0
         return state, rewards, done, active_player
 
     def _reset_all_states(self):
