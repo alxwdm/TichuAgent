@@ -105,3 +105,25 @@ def play_greedy_game(verbose=True):
             return
         if conseq_active_counter > 10:
                raise Exception("Active counter exceeded. Possible infinity loop detected.")
+
+def set_tichu_percentage(threshold):
+    """
+    Simulate 100 random games and see hands with Tichu calls
+    to determine if hand rating function is adequate and 
+    to set TICHU_THRESHOLD to a reasonable value.
+    """
+    tichu_threshold = threshold
+    tichu_cnt = 0
+    deck = Deck()
+    players = [Player(id=0), Player(id=1), Player(id=2), Player(id=3)]
+    for i in range(100):
+        myhands = deck.shuffle_and_deal()
+        for idx in range(4):
+            players[idx].assign_hand(myhands[idx])
+            score = players[idx].hand_rating
+            if score > tichu_threshold:
+                tichu_cnt += 1
+                players[idx].hand.show()
+                print('Player calls Tichu with a hand rating of {:.1f}.'.format(score))
+                print('\n')
+    print('Tichu percentage: {:.2f}'.format(tichu_cnt/100))
