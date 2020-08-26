@@ -1,3 +1,5 @@
+""" This module contains a wrapper class for a Tichu game to enable RL. """
+
 from itertools import compress
 
 import numpy as np

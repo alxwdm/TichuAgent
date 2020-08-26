@@ -1,8 +1,10 @@
+""" This module contains a class to represent multiple of Tichu Cards. """
+
 BOMBS = ['four_bomb', 'straight_bomb']
 
 class Cards():
     """
-    A class to represent multiple of Tichu Cards.
+    A class to represent 
 
     Can either be a hand (i.e. no specific combination)
     or a combination (e.g. pair, straight, ...).

@@ -1,3 +1,5 @@
+""" This module contains a class to represent a Tichu Game. """
+
 from env.deck import Deck
 from env.player import Player
 from env.stack import Stack

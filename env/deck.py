@@ -1,3 +1,5 @@
+""" This module contains a class to represent a Tichu Deck. """
+
 import random
 
 from env.card import Card

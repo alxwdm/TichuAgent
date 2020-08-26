@@ -1,3 +1,5 @@
+""" This module contains a class to represent a Tichu Player. """
+
 import random
 
 class Player():

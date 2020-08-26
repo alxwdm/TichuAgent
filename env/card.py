@@ -1,3 +1,5 @@
+""" This module contains a class to represent a Tichu Card. """
+
 import hashlib
 
 SUITS = {'Spade':'♠',

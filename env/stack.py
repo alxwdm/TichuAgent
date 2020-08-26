@@ -1,3 +1,5 @@
+""" This module contains a class to represent a Tichu Stack. """
+
 BOMBS = ['four_bomb', 'straight_bomb']
 
 class Stack():
