@@ -1,14 +1,30 @@
-# Deck class for Python Implementation of Tichu
-
 import random
 
 from env.card import Card
 from env.cards import Cards
 
 class Deck():
+    """
+    A class to represent a Tichu Deck.
+
+    Contains instances of all Cards in a Tichu deck.
+
+    Attributes
+    ----------
+    all_cards: list of Card
+      A list containing all Card objects in a Tichu deck.
+    size: int
+      The size of a Tichu deck (56).
+
+    Methods
+    -------
+    shuffle_and_deal():
+      Shuffles the deck and returns a list of 4 Cards instances to
+      start a game.
+    """
 
     def __init__(self):
-        # instatiate all cards
+        """ Instantiates all Tichu Cards. """
         Spd_2 = Card(name='2', suit='Spade')
         Hrt_2 = Card(name='2', suit='Heart')
         Dia_2 = Card(name='2', suit='Dia')
@@ -96,6 +112,7 @@ class Deck():
         self.size = len(self.all_cards)
 
     def shuffle_and_deal(self):
+        """ Shuffles the deck and returns them as a list of 4 Cards. """
         all_cards = self.all_cards
         random.shuffle(all_cards)
         chunk_size = int(self.size/4)

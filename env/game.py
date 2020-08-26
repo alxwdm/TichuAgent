@@ -1,17 +1,53 @@
-# Game class for Python Implementation of Tichu
-
 from env.deck import Deck
 from env.player import Player
 from env.stack import Stack
 
-# A thresholdo of 90 means that Tichu is
-# called in about 30 % of all games
-TICHU_THRESHOLD = 90
+
+TICHU_THRESHOLD = 90 
+# Threshold 90: Tichu is called in roughly 30 % of all games.
 
 class Game():
+    """
+    A class to represent a Tichu game.
+
+    Attributes
+    ----------
+    verbose: int
+      The Players' moves and Game info is printed if verbose > 0.
+    players: list of Player
+      A list containing all 4 Players of a Tichu Game.
+    Stack: Stack
+      Players play Cards on top of the Stack in order to win it.
+    leading_player: int
+      The Player who currently wins the Stack.
+    active_player: int
+      The Player who is currently in turn to make a move.
+    pass_counter: int
+      A counter to determine whether a Player won the Stack.
+    players_finished: list of int
+      A list containing all Players that have finished in order.
+    game_finished: bool
+      Whether the Game is finished or not.
+    tichu_points: list of int
+      The points the Players have achieved when Tichu is called.
+
+    Methods
+    -------
+    step(player_id, cards):
+      Continues the Game by making a move of player_id.
+    show_hands(player_id):
+      Prints the hand Cards of a Player.
+    """
 
     def __init__(self, verbose=0):
-        # Create deck and distribute
+        """
+        Constructs a Tichu Game, distributes cards and checks Tichu calls.
+
+        Paramter
+        --------
+        verbose: Whether to print Game states and Players actions.
+        """
+        # Create deck and distribute cards
         deck = Deck()
         sets = deck.shuffle_and_deal()
         # Set verbosity
@@ -231,6 +267,7 @@ class Game():
                 return False, points_this_step
 
     def show_hands(self, pid=None):
+        """ Prints current hand cards of pid. """
         if pid:
             print('Player {0} hand is:'.format(pid))
             self.players[pid].hand.show()
@@ -240,6 +277,7 @@ class Game():
                 self.players[i].hand.show()
 
     def _get_opponents(self, pid=None):
+        """ Returns the opponents of pid as list. """
         if not pid:
             pid = self.leading_player
         if pid%2 == 0:
@@ -249,6 +287,7 @@ class Game():
         return opps
 
     def _get_teammate(self, pid=None):
+        """ Returns the teammate of pid. """
         if not pid:
             pid = self.leading_player
         if pid == 0:
@@ -262,6 +301,8 @@ class Game():
 
     def _dragon_stack(self):
         """
+        Manages a Stack containing a Dragon Card by a simple heuristic.
+
         According to game rules, a stack with a Dragon must be given
         to a player of the opposing team.
         Here, this is determined automatically by a simple heuristic:

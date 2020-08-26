@@ -1,8 +1,3 @@
-# Card class for Python Implementation of Tichu
-# Sources:
-#  - https://github.com/hundredblocks/ticher
-#  - https://github.com/sylee421/TichuRL
-
 import hashlib
 
 SUITS = {'Spade':'♠',
@@ -29,9 +24,43 @@ CARD_VALUES = {'2': 2,
                'Dog': 0.9}
 
 class Card():
+    """
+    A class to represent a Tichu Card.
+
+    Inspired by the following sources:
+    - https://github.com/hundredblocks/ticher
+    - https://github.com/sylee421/TichuRL  
+    
+    Attributes
+    ----------
+    name: str
+      The name of the Card, i.e. '5', 'A', 'K' for regular cards
+      and 'Dragon' etc. for special cards.
+    suit: str
+      One of the following: Spade, Heart, Dia(mond), Club or Special
+    power: float
+      The power (i.e. value) of the card.
+    points: int
+      The points of the card. 
+      In Tichu, only 5, 10, K, Phoenix and Dragon give points.
+    image: str
+      A nice visualization when printing the card.
+      Depending on the device, this may need to be adapted. 
+
+    """
 
     def __init__(self, name=None, suit=None):
+        """
+        Constructs a Tichu card.
 
+        Parameter
+        ----------
+        name: str
+          The name of the Card, i.e. '5', 'A', 'K' for regular cards
+          and 'Dragon' etc. for special cards.
+        suit: str
+          One of the following: Spade, Heart, Dia(mond), Club or Special        
+        """
         self.name = name
         self.suit = suit
         self.special_card = (suit == 'Special')

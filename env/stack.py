@@ -1,11 +1,35 @@
-# Stack class for Python Implementation of Tichu
-
 BOMBS = ['four_bomb', 'straight_bomb']
 
 class Stack():
+    """
+    A class to represent a Stack in a Tichu game.
+
+    Attributes
+    ----------
+    cards: list of Cards 
+      A list of Cards that have been put on the stack.
+      The highest combination is the last entry of the list.
+    points: int
+      The aggregated points of all Cards in this Stack.
+    power: float
+      The power of the highest combination in this Stack.
+    type: str
+      The type of combination in this Stack (e.g. pair, straight).
+    dragon_flag: bool
+      Whether the Stack contains the Dragon Card or not.
+
+    Methods
+    -------
+    add(cards):
+      Adds Cards to the stack if the move is valid.
+    check_valid_move(old_cards, new_cards):
+      Checks whether new_cards can be played on top of old_cards.
+    """
 
     def __init__(self):
-
+        """
+        Constructs a Stack wit an empty list of cards.
+        """
         self.cards = list()
         self.points = 0
         self.power = 0
@@ -13,27 +37,32 @@ class Stack():
         self.dragon_flag = False
 
     def _set_power(self):
+        """ Sets Stack power after Cards have been played on top. """
         self.power = self.cards[-1].power
 
     def _set_points(self):
+        """ Sets Stack points after Cards have been played on top. """
         self.points = sum(crds.points for crds in self.cards)
 
     def _set_type(self):
+        """ Sets Stack type after Cards have been played on top. """
         self.type = self.cards[-1].type
 
     def _set_dragon_flag(self):
+        """ Sets dragon_flag after Cards have been played on top. """
         name_list = [crd.name for crds in self.cards for crd in crds.cards]
         if 'Dragon' in name_list:
             self.dragon_flag = True
 
     def _update(self):
+        """ Updates all attributes after Cards have been played on top. """
         self._set_power()
         self._set_points()
         self._set_type()
         self._set_dragon_flag()
 
     def add(self, cards_to_add):
-        # add cards to stack according to game rules
+        """ Adds cards to stack according to game rules. """
         # all but hand and pass can be played on empty stack
         if (not(self.cards) and
               cards_to_add.type != 'hand' and
@@ -78,9 +107,9 @@ class Stack():
         else:
             return False
 
-    # check if new_cards is a valid move on old_cards
     @staticmethod
     def check_valid_move(old_cards, new_cards):
+        """ Checks if new_cards is a valid move on old_cards. """
         if not(old_cards) and new_cards.type != 'hand':
             return True
         elif (old_cards.type == new_cards.type and

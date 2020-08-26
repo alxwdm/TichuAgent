@@ -1,17 +1,62 @@
-# Cards class for Python Implementation of Tichu
-# Sources:
-#  - https://github.com/hundredblocks/ticher
-#  - https://github.com/sylee421/TichuRL
-
 BOMBS = ['four_bomb', 'straight_bomb']
 
 class Cards():
+    """
+    A class to represent multiple of Tichu Cards.
+
+    Can either be a hand (i.e. no specific combination) 
+    or a combination (e.g. pair, straight, ...).
+    The type is determined automatically when adding or removing cards.
+
+    Inspired by the following sources:
+    - https://github.com/hundredblocks/ticher
+    - https://github.com/sylee421/TichuRL    
+
+    Attributes
+    ----------
+    cards: list of Card
+      A list containing all Card objects in this Cards instance.
+    phoenix_flag: bool
+      Whether this Cards instance contains a Phoenix.
+    size: int
+      The number of Cards in this instance.
+    points: int
+      The points of the card. 
+      In Tichu, only 5, 10, K, Phoenix and Dragon give points.
+    type: str
+      The type of this Cards instance (e.g. hand, pair, straight)
+    power: float
+      The power of this Cards instance. It depends on the type
+      and the highest Card. 
+      For example: A hand has 0 power, a pair of 10s has power 10.
+    points: int
+      The aggregated Card points in this instance. 
+
+    Methods
+    -------
+    show:
+      Prints all the Cards using the Card.image attribute.
+    get_available_combinations:
+      Outputs a list of all possible combinations.
+    contains(other):
+      Checks whether other (list of Card objects) are contained 
+      in this Cards instance.
+    remove(card):
+      Removes a Card from this Cards instance.
+    """
 
     size = None
     cards = None
     phoenix_flag = None
 
     def __init__(self, card_list):
+        """
+        Constructs a Cards instance.
+
+        Paramter
+        --------
+        card_list: A list of Card objects.
+        """
         self.phoenix_flag = False
         self.cards = list()
         for i in card_list:
@@ -23,9 +68,8 @@ class Cards():
         self._set_type_and_power()
         self._set_points()
 
-    # a nice visualization of all cards in the set
-    # (depending on the device, card.image might need to be adapted)
     def show(self):
+        """ A nice visualization of all cards in the set. """
         if self.size == 0:
             print('  PASS')
         else:
@@ -34,15 +78,15 @@ class Cards():
                     print(self.cards[crd].image[i], end='')
                 print()
 
-    # set number of game points of this card set
     def _set_points(self):
+        """ Set number of game points of this card set. """
         if self.type != 'pass':
             self.points = sum([crd.points for crd in self.cards])
         else:
             self.points = 0
 
-    # determine which combination (if any) is this card set
     def _set_type_and_power(self):
+        """ Determines which combination (if any) is this card set. """
         card_set = self.cards
         card_set.sort()
         phoenix_flag = self.phoenix_flag
@@ -237,8 +281,8 @@ class Cards():
             self.type = 'hand'
             self.power = 0
 
-    # get all available combinations from this card set
     def get_available_combinations(self):
+        """ Get all available combinations form this card set. """
         all_cards = self.cards
         all_cards.sort()
         phoenix_flag = self.phoenix_flag
@@ -420,15 +464,14 @@ class Cards():
         return [solo, pair, triple, four_bomb,
                 full, straight, straight_bomb, pair_seq]
 
-
-    # check if this Cards obj contains all cards from other Cards obj
     def contains(self, other):
+        """ Checks if this instance contains all cards from other. """
         this_cards = [(crd.name, crd.suit) for crd in self.cards]
         other_cards = [(crd.name, crd.suit) for crd in other.cards]
         return all([elem in this_cards for elem in other_cards])
 
-    # remove a single card (instance of Card) and update this Cards obj
     def remove(self, card):
+        """ Remove a single Card and update this Cards instance. """
         try:
             self.cards.remove(card)
         except: # if card is not in cards, return False
