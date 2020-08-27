@@ -138,7 +138,7 @@ class Player():
                       'straight_bomb': 6,
                       'pair_seq': 7}
         # initialize cards and score
-        card_list = [crd for crd in self.hand.cards]
+        card_list = self.hand.cards
         cards = Cards(card_list)
         score = 0
         # update score based on individual cards
@@ -164,9 +164,6 @@ class Player():
         if avail_combs[comb_types['straight_bomb']]:
             for crds in avail_combs[comb_types['straight_bomb']]:
                 score += 40
-                for crd in crds.cards:
-                    cards.remove(crd)
-                avail_combs = cards.get_available_combinations()
         if avail_combs[comb_types['full']]:
             max_fulls =  sum([full.power for full
                               in avail_combs[comb_types['full']]]
