@@ -76,6 +76,8 @@ class Cards():
                 self.phoenix_flag = True
         self.cards.sort()
         self.size = len(self.cards)
+        self.type = None
+        self.power = 0
         # run init functions
         self._set_type_and_power()
         self._set_points()
@@ -157,7 +159,7 @@ class Cards():
                     pair_cards = Cards(pair_list)
                     if pair_cards.type == 'pair':
                         pair.append(pair_cards)
-            except:
+            except IndexError:
                 pass
         # triple
         for i in range(len(self.cards)-2):
@@ -204,7 +206,7 @@ class Cards():
                     triple_cards = Cards(triple_list)
                     if triple_cards.type == 'triple':
                         triple.append(triple_cards)
-            except:
+            except IndexError:
                 pass
         # four
         for i in range(len(self.cards)-3):
@@ -286,10 +288,10 @@ class Cards():
             for j in range(i,len(pair)):
                 # add first element to candidate list
                 if len(candidate_list) == 0:
-                    candidate_list.extend([elem for elem in pair[j].cards])
+                    candidate_list.extend(pair[j].cards)
                 # add subsequent pairs
                 elif candidate_list[-1].power+1 == pair[j].power:
-                    candidate_list.extend([elem for elem in pair[j].cards])
+                    candidate_list.extend(pair[j].cards)
                     if len(candidate_list) > 1:
                         pair_seq_cards = Cards(candidate_list)
                         if pair_seq_cards.type == 'pair_seq':
@@ -313,7 +315,7 @@ class Cards():
         """ Remove a single Card and update this Cards instance. """
         try:
             self.cards.remove(card)
-        except: # if card is not in cards, return False
+        except ValueError: # if card is not in cards, return False
             return False
         self.cards.sort()
         if card.name == 'Phoenix':
@@ -373,7 +375,11 @@ class Cards():
 
     def _typecheck_full_straight(self):
         """ Checks whether Cards is of type full house or straight. """
-        # check for full house
+        self._typecheck_full()
+        self._typecheck_straight()
+
+    def _typecheck_full(self):
+        """ Checks whether Cards is of type full house. """
         if len(self.cards)==5:
             # regular full house with triple higher than pair
             if (self.cards[0].power == self.cards[1].power and
@@ -403,14 +409,22 @@ class Cards():
                       self.cards[3].power == self.cards[4].power):
                     self.type = 'full'
                     self.power = self.cards[2].power
-            # if type is full, do not check for straight
-            if self.type == 'full':
-                return
-        # check for straight and straight bomb
+
+    def _typecheck_straight(self):
+        """
+        Checks whether Cards is of type straight.
+
+        Can be a straight with regular cards, straight with Phoenix,
+        or straight bomb.
+        """
+        self._typecheck_regular_straight()
+        self._typecheck_phoenix_straight()
+
+    def _typecheck_regular_straight(self):
+        """ Checks whether Cards is of type straight (w/o Phoenix). """
         if len(self.cards)>=5:
             is_straight = True
             is_flush = True
-            # check for regular straight
             for i in range(len(self.cards)-1):
                 if self.cards[i].power + 1 == self.cards[i+1].power:
                     if self.cards[i].suit == self.cards[i+1].suit:
@@ -428,42 +442,42 @@ class Cards():
             if is_straight:
                 self.type = 'straight'
                 self.power = self.cards[-1].power
-                return
-            # check for phoenix straight
-            if self.phoenix_flag:
-                phoenix_used = False
-                phoenix_idx = -1
-                is_straight = True
-                for i in range(len(self.cards)-2):
-                    if self.cards[i+1].power+1 == self.cards[i+2].power:
-                        pass
-                    elif (not(phoenix_used) and
-                         (self.cards[i+1].power+2 == self.cards[i+2].power)):
-                        phoenix_used = True
-                        phoenix_idx = i+1
-                    else:
-                        is_straight = False
-                if is_straight:
-                    self.type = 'straight'
-                    # phoenix is last card of straight: power is last card + 1
-                    if not(phoenix_used) or (phoenix_idx == len(self.cards)):
-                        self.power = self.cards[-1].power+1
-                    # phoenix is not last card of straight: power is last card
-                    else:
-                        self.power = self.cards[-1].power
+
+    def _typecheck_phoenix_straight(self):
+        """ Checks whether Cards is of type straight (with Phoenix). """
+        if len(self.cards)>=5 and self.phoenix_flag:
+            phoenix_used = False
+            phoenix_idx = -1
+            is_straight = True
+            for i in range(len(self.cards)-2):
+                if self.cards[i+1].power+1 == self.cards[i+2].power:
+                    pass
+                elif (not(phoenix_used) and
+                     (self.cards[i+1].power+2 == self.cards[i+2].power)):
+                    phoenix_used = True
+                    phoenix_idx = i+1
+                else:
+                    is_straight = False
+            if is_straight:
+                self.type = 'straight'
+                # phoenix is last card of straight: power is last card + 1
+                if not(phoenix_used) or (phoenix_idx == len(self.cards)):
+                    self.power = self.cards[-1].power+1
+                # phoenix is not last card of straight: power is last card
+                else:
+                    self.power = self.cards[-1].power
 
     def _typecheck_pair_seq(self):
-        """ 
-        Checks whether Cards is of type pair sequence.
+        """ Checks whether Cards is of type pair sequence. """
+        self._typecheck_regular_pair_seq()
+        self._typecheck_phoenix_pair_seq()
 
-        For a phoenix pair sequence, the algorithm is quite complicated,
-        because there are a lot of possible combinations.
-        (Phoenix can be used in first pair, any middle pair, or last pair)
-        """
+
+    def _typecheck_regular_pair_seq(self):
+        """ Checks whether Cards is of type pair_seq (w/o Phoenix). """
         if (len(self.cards)>=4 and len(self.cards)%2==0 and
               not(any((crd.name == 'Dog' or crd.name == 'Dragon')
               for crd in self.cards))):
-            # check for regular pair sequence
             is_pair_regular = True
             for i in range(len(self.cards)-1):
                 if i%2 == 0 and self.cards[i].power == self.cards[i+1].power:
@@ -476,59 +490,72 @@ class Cards():
             if is_pair_regular:
                 self.type = 'pair_seq'
                 self.power = self.cards[-1].power
-                return
-            # check for phoenix pair sequence
-            if self.phoenix_flag:
-                # first, check if it is an increasing by +1 sequence
-                unique_power = sorted(set([crd.power for crd in self.cards]))
-                unique_power.pop(0) # remove phoenix from set
-                if (all(x+1==y for x, y in zip(unique_power, unique_power[1:])
-                      ) and len(unique_power)>1):
-                    phoenix_used = False
-                    is_pair_equal = True
-                    is_pair_unequal = True
-                    # check for phoenix use in unequal card list index
-                    toggle = 1
-                    antitoggle = 0
-                    for i in range(1,len(self.cards)-1):
-                        if (i%2 == toggle and
-                              self.cards[i].power == self.cards[i+1].power):
-                            pass
-                        elif (i%2 == antitoggle and
-                              self.cards[i].power + 1 == self.cards[i+1].power):
-                            if i+1 >= len(self.cards)-1 and not phoenix_used:
-                                # phoenix used as the highest pair of sequence
-                                phoenix_used = True
-                        elif phoenix_used: # phoenix cannot be used twice
-                            is_pair_unequal = False
-                            break
-                        else:
-                            # if phoenix is used in the middle of the sequence,
-                            # change matching behavior of toggle/antitoggle
-                            # so that i%2 matches next element
-                            phoenix_used = True
-                            toggle = 0
-                            antitoggle = 1
-                    # check for phoenix use in equal card list index
-                    if not is_pair_unequal:
-                        phoenix_used = False
-                        for i in range(1,len(self.cards)-1):
-                            if (i%2 == 0 and
-                                  self.cards[i].power == self.cards[i+1].power):
-                                pass
-                            elif (i%2 == 1 and
-                                  self.cards[i].power+1 == self.cards[i+1].power):
-                                # check if phoenix is first card in sequence
-                                if i == 1:
-                                    phoenix_used = True
-                            elif phoenix_used: # phoenix cannot be used twice
-                                is_pair_equal = False
-                                break
-                            else:
-                                phoenix_used = True
-                    if is_pair_unequal or is_pair_equal:
-                        self.type = 'pair_seq'
-                        self.power = self.cards[-1].power
+
+    def _typecheck_phoenix_pair_seq(self):
+        """
+        Checks whether Cards is of type pair_seq (with Phoenix).
+
+        For a phoenix pair sequence, the algorithm is quite complicated,
+        because there are a lot of possible combinations.
+        (Phoenix can be used in first pair, any middle pair, or last pair)"""
+        # return if pair sequence is not possible
+        if not (len(self.cards)>=4 and len(self.cards)%2==0 and
+              not(any((crd.name == 'Dog' or crd.name == 'Dragon')
+              for crd in self.cards)) and
+              self.phoenix_flag):
+            return
+        # return if card sequence without Phoenix does not increase by 1
+        unique_power = sorted({crd.power for crd in self.cards})
+        unique_power.pop(0) # remove phoenix from set
+        if not (all(x+1==y for x, y in zip(unique_power, unique_power[1:])
+              ) and len(unique_power)>1):
+            return
+        # continue and prepare local variables if preconditions are met
+        phoenix_used = False
+        is_pair_equal = True
+        is_pair_unequal = True
+        # check for phoenix use in unequal card list index
+        toggle = 1
+        antitoggle = 0
+        for i in range(1,len(self.cards)-1):
+            if (i%2 == toggle and
+                  self.cards[i].power == self.cards[i+1].power):
+                pass
+            elif (i%2 == antitoggle and
+                  self.cards[i].power + 1 == self.cards[i+1].power):
+                if i+1 >= len(self.cards)-1 and not phoenix_used:
+                    # phoenix used as the highest pair of sequence
+                    phoenix_used = True
+            elif phoenix_used: # phoenix cannot be used twice
+                is_pair_unequal = False
+                break
+            else:
+                # if phoenix is used in the middle of the sequence,
+                # change matching behavior of toggle/antitoggle
+                # so that i%2 matches next element
+                phoenix_used = True
+                toggle = 0
+                antitoggle = 1
+        # check for phoenix use in equal card list index
+        if not is_pair_unequal:
+            phoenix_used = False
+            for i in range(1,len(self.cards)-1):
+                if (i%2 == 0 and
+                      self.cards[i].power == self.cards[i+1].power):
+                    pass
+                elif (i%2 == 1 and
+                      self.cards[i].power+1 == self.cards[i+1].power):
+                    # check if phoenix is first card in sequence
+                    if i == 1:
+                        phoenix_used = True
+                elif phoenix_used: # phoenix cannot be used twice
+                    is_pair_equal = False
+                    break
+                else:
+                    phoenix_used = True
+        if is_pair_unequal or is_pair_equal:
+            self.type = 'pair_seq'
+            self.power = self.cards[-1].power
 
     def __add__(self, card_list_to_add):
         this_card_list = self.cards
