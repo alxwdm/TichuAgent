@@ -114,194 +114,13 @@ class Cards():
 
     def get_available_combinations(self):
         """ Get all available combinations form this card set. """
-        all_cards = self.cards
-        all_cards.sort()
-        phoenix_flag = self.phoenix_flag
-
-        solo = list()
-        pair = list()
-        triple = list()
-        four_bomb = list()
-        full = list()
-        straight = list()
-        straight_bomb = list()
-        pair_seq = list()
-
-        # solo
-        for i in range(len(self.cards)):
-            solo_list = all_cards[i]
-            solo_cards = Cards([solo_list])
-            if solo_cards.type == 'solo':
-                solo.append(solo_cards)
-        # pair
-        for i in range(len(all_cards)-1):
-            # regular pairs
-            if all_cards[i].power == all_cards[i+1].power:
-                pair_list = [all_cards[i], all_cards[i+1]]
-                pair_cards = Cards(pair_list)
-                if pair_cards.type == 'pair':
-                    pair.append(pair_cards)
-            # phoenix pairs
-            if phoenix_flag and all_cards[i+1].suit != 'Special':
-                pair_list = [all_cards[0], all_cards[i+1]]
-                pair_cards = Cards(pair_list)
-                if pair_cards.type == 'pair':
-                    pair.append(pair_cards)
-            # multiple pairs
-            try:
-                if all_cards[i].power == all_cards[i+2].power:
-                    pair_list = [all_cards[i], all_cards[i+2]]
-                    pair_cards = Cards(pair_list)
-                    if pair_cards.type == 'pair':
-                        pair.append(pair_cards)
-                if all_cards[i].power == all_cards[i+3].power:
-                    pair_list = [all_cards[i], all_cards[i+3]]
-                    pair_cards = Cards(pair_list)
-                    if pair_cards.type == 'pair':
-                        pair.append(pair_cards)
-            except IndexError:
-                pass
-        # triple
-        for i in range(len(self.cards)-2):
-            # regular triple
-            if (all_cards[i].power == all_cards[i+1].power and
-                all_cards[i+1].power == all_cards[i+2].power):
-                triple_list = [all_cards[i], all_cards[i+1], all_cards[i+2]]
-                triple_cards = Cards(triple_list)
-                if triple_cards.type == 'triple':
-                    triple.append(triple_cards)
-            # phoenix triple
-            if phoenix_flag and all_cards[i+1].power == all_cards[i+2].power:
-                triple_list = [all_cards[0], all_cards[i+1], all_cards[i+2]]
-                triple_cards = Cards(triple_list)
-                if triple_cards.type == 'triple':
-                    triple.append(triple_cards)
-            # multiple triples
-            try:
-                if (all_cards[i].power == all_cards[i+1].power and
-                      all_cards[i+1].power == all_cards[i+3].power):
-                    triple_list = [all_cards[i], all_cards[i+1],
-                                   all_cards[i+3]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
-                if (all_cards[i].power == all_cards[i+2].power and
-                      all_cards[i+2].power == all_cards[i+3].power):
-                    triple_list = [all_cards[i], all_cards[i+2],
-                                   all_cards[i+3]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
-                if (phoenix_flag and
-                      all_cards[i+1].power == all_cards[i+3].power):
-                    triple_list = [all_cards[0], all_cards[i+1],
-                                   all_cards[i+3]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
-                if (phoenix_flag and
-                      all_cards[i+1].power == all_cards[i+4].power):
-                    triple_list = [all_cards[0], all_cards[i+1],
-                                   all_cards[i+4]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
-            except IndexError:
-                pass
-        # four
-        for i in range(len(self.cards)-3):
-            if (all_cards[i].power == all_cards[i+1].power and
-                  all_cards[i+1].power == all_cards[i+2].power and
-                  all_cards[i+2].power == all_cards[i+3].power):
-                four_list = [all_cards[i], all_cards[i+1],
-                             all_cards[i+2], all_cards[i+3]]
-                four_cards = Cards(four_list)
-                if four_cards.type == 'four_bomb':
-                    four_bomb.append(four_cards)
-        # full house
-        for i in pair:
-            for j in triple:
-                if i.power != j.power:
-                    full_list = list()
-                    full_list.extend(i.cards)
-                    full_list.extend(j.cards)
-                    full_cards = Cards(full_list)
-                    if full_cards.type == 'full':
-                        full.append(full_cards)
-        # straight and straight_bomb
-        for i in range(len(self.cards)-4):
-            candidate_list = list()
-            phoenix_available = self.phoenix_flag
-            for j in range(i,len(self.cards)):
-                # add first card of possible straight
-                if len(candidate_list)==0:
-                    candidate_list.append(all_cards[j])
-                    if all_cards[j].name == 'Phoenix':
-                        phoenix_available = False
-                # no check if Phoenix is last entry
-                elif candidate_list[-1].name == 'Phoenix':
-                    candidate_list.append(all_cards[j])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
-                        else:
-                            pass
-                # add subsequent cards
-                elif candidate_list[-1].power+1 == all_cards[j].power:
-                    candidate_list.append(all_cards[j])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
-                        elif straight_cards.type == 'straight_bomb':
-                            straight_bomb.append(straight_cards)
-                        else:
-                            pass
-                # skip pairs
-                elif candidate_list[-1].power == all_cards[j].power:
-                    pass
-                # use phoenix mid straight if available
-                elif (phoenix_available and
-                    candidate_list[-1].power+2 == all_cards[j].power):
-                    candidate_list.append(all_cards[0])
-                    candidate_list.append(all_cards[j])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
-                    phoenix_available = False
-                # use phoenix as first/last card if available
-                elif phoenix_available:
-                    candidate_list.append(all_cards[0])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
-                    phoenix_available = False
-                # no straight possible
-                else:
-                    break
-        # pair_seq
-        for i in range(len(pair)-1):
-            candidate_list = list()
-            for j in range(i,len(pair)):
-                # add first element to candidate list
-                if len(candidate_list) == 0:
-                    candidate_list.extend(pair[j].cards)
-                # add subsequent pairs
-                elif candidate_list[-1].power+1 == pair[j].power:
-                    candidate_list.extend(pair[j].cards)
-                    if len(candidate_list) > 1:
-                        pair_seq_cards = Cards(candidate_list)
-                        if pair_seq_cards.type == 'pair_seq':
-                            pair_seq.append(pair_seq_cards)
-                # skip double pairs
-                elif candidate_list[-1].power == pair[j].power:
-                    pass
-                # break if no pair_seq possible
-                else:
-                    break
+        solo = self._get_available_solo()
+        pair = self._get_available_pair()
+        triple = self._get_available_triple()
+        four_bomb = self._get_available_four_bomb()
+        full = self._get_available_full()
+        straight, straight_bomb = self._get_available_straight()
+        pair_seq = self._get_available_pair_seq()
         return [solo, pair, triple, four_bomb,
                 full, straight, straight_bomb, pair_seq]
 
@@ -497,7 +316,14 @@ class Cards():
 
         For a phoenix pair sequence, the algorithm is quite complicated,
         because there are a lot of possible combinations.
-        (Phoenix can be used in first pair, any middle pair, or last pair)"""
+        Phoenix can be used in the first pair, in any middle pair, or in
+        the last pair.
+        Depending on where the Phoenix is used, either all equal or all
+        unequal indices are increments of 1 in a valid pair sequence.
+        If the Phoenix is used as a replacement for an equal indexed card,
+        then the logic turns around ("toggles") and all subsequent cards
+        need to be increments of the previous card in unequal indices.
+        """
         # return if pair sequence is not possible
         if not (len(self.cards)>=4 and len(self.cards)%2==0 and
               not(any((crd.name == 'Dog' or crd.name == 'Dragon')
@@ -514,7 +340,7 @@ class Cards():
         phoenix_used = False
         is_pair_equal = True
         is_pair_unequal = True
-        # check for phoenix use in unequal card list index
+        # check for phoenix use in equal card list index
         toggle = 1
         antitoggle = 0
         for i in range(1,len(self.cards)-1):
@@ -556,6 +382,216 @@ class Cards():
         if is_pair_unequal or is_pair_equal:
             self.type = 'pair_seq'
             self.power = self.cards[-1].power
+
+    def _get_available_solo(self):
+        """ Returns a list with all possible solo combinations. """
+        solo = list()
+        for i in range(len(self.cards)):
+            solo_list = self.cards[i]
+            solo_cards = Cards([solo_list])
+            if solo_cards.type == 'solo':
+                solo.append(solo_cards)
+        return solo
+
+    def _get_available_pair(self):
+        """ Returns a list with all possible pair combinations. """
+        pair = list()
+        for i in range(len(self.cards)-1):
+            # regular pairs
+            if self.cards[i].power == self.cards[i+1].power:
+                pair_list = [self.cards[i], self.cards[i+1]]
+                pair_cards = Cards(pair_list)
+                if pair_cards.type == 'pair':
+                    pair.append(pair_cards)
+            # phoenix pairs
+            if self.phoenix_flag and self.cards[i+1].suit != 'Special':
+                pair_list = [self.cards[0], self.cards[i+1]]
+                pair_cards = Cards(pair_list)
+                if pair_cards.type == 'pair':
+                    pair.append(pair_cards)
+            # multiple pairs
+            try:
+                if self.cards[i].power == self.cards[i+2].power:
+                    pair_list = [self.cards[i], self.cards[i+2]]
+                    pair_cards = Cards(pair_list)
+                    if pair_cards.type == 'pair':
+                        pair.append(pair_cards)
+                if self.cards[i].power == self.cards[i+3].power:
+                    pair_list = [self.cards[i], self.cards[i+3]]
+                    pair_cards = Cards(pair_list)
+                    if pair_cards.type == 'pair':
+                        pair.append(pair_cards)
+            except IndexError:
+                pass
+        return pair
+
+    def _get_available_triple(self):
+        """ Returns a list with all possible triple combinations. """
+        triple = list()
+        for i in range(len(self.cards)-2):
+            # regular triple
+            if (self.cards[i].power == self.cards[i+1].power and
+                self.cards[i+1].power == self.cards[i+2].power):
+                triple_list = [self.cards[i], self.cards[i+1], self.cards[i+2]]
+                triple_cards = Cards(triple_list)
+                if triple_cards.type == 'triple':
+                    triple.append(triple_cards)
+            # phoenix triple
+            if (self.phoenix_flag and
+                  self.cards[i+1].power == self.cards[i+2].power):
+                triple_list = [self.cards[0], self.cards[i+1], self.cards[i+2]]
+                triple_cards = Cards(triple_list)
+                if triple_cards.type == 'triple':
+                    triple.append(triple_cards)
+            # multiple triples
+            try:
+                if (self.cards[i].power == self.cards[i+1].power and
+                      self.cards[i+1].power == self.cards[i+3].power):
+                    triple_list = [self.cards[i], self.cards[i+1],
+                                   self.cards[i+3]]
+                    triple_cards = Cards(triple_list)
+                    if triple_cards.type == 'triple':
+                        triple.append(triple_cards)
+                if (self.cards[i].power == self.cards[i+2].power and
+                      self.cards[i+2].power == self.cards[i+3].power):
+                    triple_list = [self.cards[i], self.cards[i+2],
+                                   self.cards[i+3]]
+                    triple_cards = Cards(triple_list)
+                    if triple_cards.type == 'triple':
+                        triple.append(triple_cards)
+                if (self.phoenix_flag and
+                      self.cards[i+1].power == self.cards[i+3].power):
+                    triple_list = [self.cards[0], self.cards[i+1],
+                                   self.cards[i+3]]
+                    triple_cards = Cards(triple_list)
+                    if triple_cards.type == 'triple':
+                        triple.append(triple_cards)
+                if (self.phoenix_flag and
+                      self.cards[i+1].power == self.cards[i+4].power):
+                    triple_list = [self.cards[0], self.cards[i+1],
+                                   self.cards[i+4]]
+                    triple_cards = Cards(triple_list)
+                    if triple_cards.type == 'triple':
+                        triple.append(triple_cards)
+            except IndexError:
+                pass
+        return triple
+
+    def _get_available_four_bomb(self):
+        """ Returns a list with all possible four bomb combinations. """
+        four_bomb = list()
+        for i in range(len(self.cards)-3):
+            if (self.cards[i].power == self.cards[i+1].power and
+                  self.cards[i+1].power == self.cards[i+2].power and
+                  self.cards[i+2].power == self.cards[i+3].power):
+                four_list = [self.cards[i], self.cards[i+1],
+                             self.cards[i+2], self.cards[i+3]]
+                four_cards = Cards(four_list)
+                if four_cards.type == 'four_bomb':
+                    four_bomb.append(four_cards)
+        return four_bomb
+
+    def _get_available_full(self):
+        """ Returns a list with all possible full house combinations. """
+        full = list()
+        pair = self._get_available_pair()
+        triple = self._get_available_triple()
+        for i in pair:
+            for j in triple:
+                if i.power != j.power:
+                    full_list = list()
+                    full_list.extend(i.cards)
+                    full_list.extend(j.cards)
+                    full_cards = Cards(full_list)
+                    if full_cards.type == 'full':
+                        full.append(full_cards)
+        return full
+
+    def _get_available_straight(self):
+        """ Returns a list with all possible straight combinations. """
+        straight = list()
+        straight_bomb = list()
+        for i in range(len(self.cards)-4):
+            candidate_list = list()
+            phoenix_available = self.phoenix_flag
+            for j in range(i,len(self.cards)):
+                # add first card of possible straight
+                if len(candidate_list)==0:
+                    candidate_list.append(self.cards[j])
+                    if self.cards[j].name == 'Phoenix':
+                        phoenix_available = False
+                # no check if Phoenix is last entry
+                elif candidate_list[-1].name == 'Phoenix':
+                    candidate_list.append(self.cards[j])
+                    if len(candidate_list) > 4:
+                        straight_cards = Cards(candidate_list)
+                        if straight_cards.type == 'straight':
+                            straight.append(straight_cards)
+                        else:
+                            pass
+                # add subsequent cards
+                elif candidate_list[-1].power+1 == self.cards[j].power:
+                    candidate_list.append(self.cards[j])
+                    if len(candidate_list) > 4:
+                        straight_cards = Cards(candidate_list)
+                        if straight_cards.type == 'straight':
+                            straight.append(straight_cards)
+                        elif straight_cards.type == 'straight_bomb':
+                            straight_bomb.append(straight_cards)
+                        else:
+                            pass
+                # skip pairs
+                elif candidate_list[-1].power == self.cards[j].power:
+                    pass
+                # use phoenix mid straight if available
+                elif (phoenix_available and
+                    candidate_list[-1].power+2 == self.cards[j].power):
+                    candidate_list.append(self.cards[0])
+                    candidate_list.append(self.cards[j])
+                    if len(candidate_list) > 4:
+                        straight_cards = Cards(candidate_list)
+                        if straight_cards.type == 'straight':
+                            straight.append(straight_cards)
+                    phoenix_available = False
+                # use phoenix as first/last card if available
+                elif phoenix_available:
+                    candidate_list.append(self.cards[0])
+                    if len(candidate_list) > 4:
+                        straight_cards = Cards(candidate_list)
+                        if straight_cards.type == 'straight':
+                            straight.append(straight_cards)
+                    phoenix_available = False
+                # no straight possible
+                else:
+                    break
+        return straight, straight_bomb
+
+    def _get_available_pair_seq(self):
+        """ Returns a list with all possible pair sequence combinations. """
+        pair_seq = list()
+        pair = self._get_available_pair()
+        for i in range(len(pair)-1):
+            candidate_list = list()
+            for j in range(i,len(pair)):
+                # add first element to candidate list
+                if len(candidate_list) == 0:
+                    candidate_list.extend(pair[j].cards)
+                # add subsequent pairs
+                elif candidate_list[-1].power+1 == pair[j].power:
+                    candidate_list.extend(pair[j].cards)
+                    if len(candidate_list) > 1:
+                        pair_seq_cards = Cards(candidate_list)
+                        if pair_seq_cards.type == 'pair_seq':
+                            pair_seq.append(pair_seq_cards)
+                # skip double pairs
+                elif candidate_list[-1].power == pair[j].power:
+                    pass
+                # break if no pair_seq possible
+                else:
+                    break
+        return pair_seq
+
+
 
     def __add__(self, card_list_to_add):
         this_card_list = self.cards
