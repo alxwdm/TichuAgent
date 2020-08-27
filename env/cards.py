@@ -59,6 +59,15 @@ class Cards():
         --------
         card_list: A list of Card objects.
         """
+        # dispatch table for type checking function
+        self.dispatch_type = {0: self._typecheck_pass,
+                              1: self._typecheck_solo,
+                              2: self._typecheck_pair,
+                              3: self._typecheck_triple,
+                              4: self._typecheck_four_bomb,
+                              5: self._typecheck_full_straight,
+                              6: self._typecheck_pair_seq}
+        # set attributes
         self.phoenix_flag = False
         self.cards = list()
         for i in card_list:
@@ -67,6 +76,7 @@ class Cards():
                 self.phoenix_flag = True
         self.cards.sort()
         self.size = len(self.cards)
+        # run init functions
         self._set_type_and_power()
         self._set_points()
 
@@ -89,198 +99,13 @@ class Cards():
 
     def _set_type_and_power(self):
         """ Determines which combination (if any) is this card set. """
-        card_set = self.cards
-        card_set.sort()
-        phoenix_flag = self.phoenix_flag
         self.type = 'unk'
-        # pass
-        if len(card_set)==0:
-            self.type = 'pass'
-            self.power = 0
-            return
-        # solo
-        if len(card_set)==1:
-            self.type = 'solo'
-            self.power = card_set[0].power
-            return
-        # pair
-        if len(card_set)==2:
-            if card_set[0].power == card_set[1].power:
-                self.type = 'pair'
-                self.power = card_set[0].power
-                return
-            # phoenix pair
-            elif (phoenix_flag and
-                  not (card_set[1].name == 'Dragon' or
-                       card_set[1].name == 'Dog')):
-                self.type = 'pair'
-                self.power = card_set[1].power
-                return
-        # triple
-        if len(card_set)==3:
-            if (card_set[0].power == card_set[1].power and
-                card_set[1].power == card_set[2].power):
-                self.type = 'triple'
-                self.power = card_set[0].power
-                return
-            # phoenix triple
-            elif phoenix_flag and card_set[1].power == card_set[2].power:
-                self.type = 'triple'
-                self.power = card_set[1].power
-                return
-        # four (BOMB)
-        if (len(card_set)==4 and card_set[0].power == card_set[1].power and
-            card_set[1].power == card_set[2].power and
-            card_set[2].power == card_set[3].power):
-            self.type = 'four_bomb'
-            self.power = 50 + card_set[0].power
-            return
-        # full house
-        if len(card_set)==5:
-            if (card_set[0].power == card_set[1].power and
-                  card_set[1].power == card_set[2].power and
-                  card_set[3].power == card_set[4].power):
-                self.type = 'full'
-                self.power = card_set[0].power
-                return
-            elif (card_set[0].power == card_set[1].power and
-                    card_set[2].power == card_set[3].power and
-                    card_set[3].power == card_set[4].power):
-                self.type = 'full'
-                self.power = card_set[2].power
-                return
-            # phoenix full house with phoenix triple
-            elif (phoenix_flag and
-                    card_set[1].power == card_set[2].power and
-                    card_set[3].power == card_set[4].power):
-                self.type = 'full'
-                self.power = card_set[3].power
-                return
-            # phoenix full house with phoenix pair
-            elif phoenix_flag:
-                if (card_set[1].power == card_set[2].power and
-                      card_set[2].power == card_set[3].power):
-                    self.type = 'full'
-                    self.power = card_set[1].power
-                    return
-                elif (card_set[2].power == card_set[3].power and
-                      card_set[3].power == card_set[4].power):
-                    self.type = 'full'
-                    self.power = card_set[2].power
-                    return
-        # straight and straight bomb
-        if len(card_set)>=5:
-            is_straight = True
-            is_flush = True
-            for i in range(len(card_set)-1):
-                if card_set[i].power + 1 == card_set[i+1].power:
-                    if card_set[i].suit == card_set[i+1].suit:
-                        pass
-                    else:
-                        is_flush = False
-                else:
-                    is_straight = False
-                    break
-            if is_straight and is_flush:
-                self.type = 'straight_bomb'
-                self.power = 100 + card_set[-1].power
-                return
-            if is_straight:
-                self.type = 'straight'
-                self.power = card_set[-1].power
-                return
-            # phoenix straight
-            if phoenix_flag:
-                phoenix_used = False
-                phoenix_idx = -1
-                is_straight = True
-                for i in range(len(card_set)-2):
-                    if card_set[i+1].power+1 == card_set[i+2].power:
-                        pass
-                    elif (not(phoenix_used) and
-                         (card_set[i+1].power+2 == card_set[i+2].power)):
-                        phoenix_used = True
-                        phoenix_idx = i+1
-                    else:
-                        is_straight = False
-                if is_straight:
-                    self.type = 'straight'
-                    # phoenix is last card of straight
-                    if not(phoenix_used) or (phoenix_idx == len(card_set)):
-                        self.power = card_set[-1].power+1
-                    else:
-                        self.power = card_set[-1].power
-                    return
-        # pair sequence
-        if (len(card_set)>=4 and len(card_set)%2==0 and
-            not(any((crd.name == 'Dog' or crd.name == 'Dragon')
-                for crd in card_set))):
-            is_pair_regular = True
-            for i in range(len(card_set)-1):
-                if i%2 == 0 and card_set[i].power == card_set[i+1].power:
-                    pass
-                elif i%2 == 1 and card_set[i].power+1 == card_set[i+1].power:
-                    pass
-                else:
-                    is_pair_regular = False
-                    break
-            if is_pair_regular:
-                self.type = 'pair_seq'
-                self.power = card_set[-1].power
-                return
-            # phoenix pair sequence (quite complicated to get all valid cases)
-            if phoenix_flag:
-                # first, check if it is an increasing by +1 sequence
-                unique_power = sorted(set([crd.power for crd in card_set]))
-                unique_power.pop(0) # remove phoenix
-                if (all(x+1==y for x, y in zip(unique_power, unique_power[1:])
-                      ) and len(unique_power)>1):
-                    phoenix_used = False
-                    is_pair_equal = True
-                    is_pair_unequal = True
-                    # check for phoenix use in 'unequal' index
-                    toggle = 1
-                    antitoggle = 0
-                    for i in range(1,len(card_set)-1):
-                        if (i%2 == toggle and
-                              card_set[i].power == card_set[i+1].power):
-                            pass
-                        elif (i%2 == antitoggle and
-                              card_set[i].power + 1 == card_set[i+1].power):
-                            if i+1 >= len(card_set)-1 and not phoenix_used:
-                                # phoenix used as the highest pair of sequence
-                                phoenix_used = True
-                        elif phoenix_used: # phoenix cannot be used twice
-                            is_pair_unequal = False
-                            break
-                        else:
-                            # phoenix is used in the middle of the sequence
-                            # toggle 1 and 0 so that i%2 matches next element
-                            phoenix_used = True
-                            toggle = 0
-                            antitoggle = 1
-                    # check for phoenix use in 'equal' index
-                    if not is_pair_unequal:
-                        phoenix_used = False
-                        for i in range(1,len(card_set)-1):
-                            if (i%2 == 0 and
-                                  card_set[i].power == card_set[i+1].power):
-                                pass
-                            elif (i%2 == 1 and
-                                  card_set[i].power+1 == card_set[i+1].power):
-                                # check if phoenix is first card in sequence
-                                if i == 1:
-                                    phoenix_used = True
-                            elif phoenix_used: # phoenix cannot be used twice
-                                is_pair_equal = False
-                                break
-                            else:
-                                phoenix_used = True
-                    if is_pair_unequal or is_pair_equal:
-                        self.type = 'pair_seq'
-                        self.power = card_set[-1].power
-                        return
-        # no combination must be a hand
+        # check for all but pair sequence depending on card length
+        self.dispatch_type[min(len(self.cards),5)]()
+        # if type is still unkown, check for pair sequence
+        if self.type == 'unk':
+            self.dispatch_type[6]()
+        # if type is still unkown, it must be a hand
         if self.type == 'unk':
             self.type = 'hand'
             self.power = 0
@@ -497,6 +322,213 @@ class Cards():
         self._set_type_and_power()
         self._set_points()
         return True
+
+    def _typecheck_pass(self):
+        """ Checks whether Cards is of type pass. """
+        if len(self.cards)==0:
+            self.type = 'pass'
+            self.power = 0
+
+    def _typecheck_solo(self):
+        """ Checks whether Cards is of type solo. """
+        if len(self.cards)==1:
+            self.type = 'solo'
+            self.power = self.cards[0].power
+
+    def _typecheck_pair(self):
+        """ Checks whether Cards is of type pair. """
+        if len(self.cards)==2:
+            # regular pair
+            if self.cards[0].power == self.cards[1].power:
+                self.type = 'pair'
+                self.power = self.cards[0].power
+                return
+            # phoenix pair
+            elif (self.phoenix_flag and
+                  not (self.cards[1].name == 'Dragon' or
+                       self.cards[1].name == 'Dog')):
+                self.type = 'pair'
+                self.power = self.cards[1].power
+
+    def _typecheck_triple(self):
+        """ Checks whether Cards is of type triple. """
+        if len(self.cards)==3:
+            # regular triple
+            if (self.cards[0].power == self.cards[1].power and
+                  self.cards[1].power == self.cards[2].power):
+                self.type = 'triple'
+                self.power = self.cards[0].power
+            # phoenix triple
+            elif self.phoenix_flag and self.cards[1].power == self.cards[2].power:
+                self.type = 'triple'
+                self.power = self.cards[1].power
+
+    def _typecheck_four_bomb(self):
+        """ Checks whether Cards is of type four bomb. """
+        if (len(self.cards)==4 and self.cards[0].power == self.cards[1].power and
+              self.cards[1].power == self.cards[2].power and
+              self.cards[2].power == self.cards[3].power):
+            self.type = 'four_bomb'
+            self.power = 50 + self.cards[0].power
+
+    def _typecheck_full_straight(self):
+        """ Checks whether Cards is of type full house or straight. """
+        # check for full house
+        if len(self.cards)==5:
+            # regular full house with triple higher than pair
+            if (self.cards[0].power == self.cards[1].power and
+                  self.cards[1].power == self.cards[2].power and
+                  self.cards[3].power == self.cards[4].power):
+                self.type = 'full'
+                self.power = self.cards[0].power
+            # regular full house with pair higher than triple
+            elif (self.cards[0].power == self.cards[1].power and
+                  self.cards[2].power == self.cards[3].power and
+                  self.cards[3].power == self.cards[4].power):
+                self.type = 'full'
+                self.power = self.cards[2].power
+            # phoenix full house with phoenix triple
+            elif (self.phoenix_flag and
+                  self.cards[1].power == self.cards[2].power and
+                  self.cards[3].power == self.cards[4].power):
+                self.type = 'full'
+                self.power = self.cards[3].power
+            # phoenix full house with phoenix pair
+            elif self.phoenix_flag:
+                if (self.cards[1].power == self.cards[2].power and
+                      self.cards[2].power == self.cards[3].power):
+                    self.type = 'full'
+                    self.power = self.cards[1].power
+                elif (self.cards[2].power == self.cards[3].power and
+                      self.cards[3].power == self.cards[4].power):
+                    self.type = 'full'
+                    self.power = self.cards[2].power
+            # if type is full, do not check for straight
+            if self.type == 'full':
+                return
+        # check for straight and straight bomb
+        if len(self.cards)>=5:
+            is_straight = True
+            is_flush = True
+            # check for regular straight
+            for i in range(len(self.cards)-1):
+                if self.cards[i].power + 1 == self.cards[i+1].power:
+                    if self.cards[i].suit == self.cards[i+1].suit:
+                        pass
+                    else:
+                        is_flush = False
+                else:
+                    is_straight = False
+                    break
+            # if it is a straight and all suits are equal, it is a bomb
+            if is_straight and is_flush:
+                self.type = 'straight_bomb'
+                self.power = 100 + self.cards[-1].power
+                return
+            if is_straight:
+                self.type = 'straight'
+                self.power = self.cards[-1].power
+                return
+            # check for phoenix straight
+            if self.phoenix_flag:
+                phoenix_used = False
+                phoenix_idx = -1
+                is_straight = True
+                for i in range(len(self.cards)-2):
+                    if self.cards[i+1].power+1 == self.cards[i+2].power:
+                        pass
+                    elif (not(phoenix_used) and
+                         (self.cards[i+1].power+2 == self.cards[i+2].power)):
+                        phoenix_used = True
+                        phoenix_idx = i+1
+                    else:
+                        is_straight = False
+                if is_straight:
+                    self.type = 'straight'
+                    # phoenix is last card of straight: power is last card + 1
+                    if not(phoenix_used) or (phoenix_idx == len(self.cards)):
+                        self.power = self.cards[-1].power+1
+                    # phoenix is not last card of straight: power is last card
+                    else:
+                        self.power = self.cards[-1].power
+
+    def _typecheck_pair_seq(self):
+        """ 
+        Checks whether Cards is of type pair sequence.
+
+        For a phoenix pair sequence, the algorithm is quite complicated,
+        because there are a lot of possible combinations.
+        (Phoenix can be used in first pair, any middle pair, or last pair)
+        """
+        if (len(self.cards)>=4 and len(self.cards)%2==0 and
+              not(any((crd.name == 'Dog' or crd.name == 'Dragon')
+              for crd in self.cards))):
+            # check for regular pair sequence
+            is_pair_regular = True
+            for i in range(len(self.cards)-1):
+                if i%2 == 0 and self.cards[i].power == self.cards[i+1].power:
+                    pass
+                elif i%2 == 1 and self.cards[i].power+1 == self.cards[i+1].power:
+                    pass
+                else:
+                    is_pair_regular = False
+                    break
+            if is_pair_regular:
+                self.type = 'pair_seq'
+                self.power = self.cards[-1].power
+                return
+            # check for phoenix pair sequence
+            if self.phoenix_flag:
+                # first, check if it is an increasing by +1 sequence
+                unique_power = sorted(set([crd.power for crd in self.cards]))
+                unique_power.pop(0) # remove phoenix from set
+                if (all(x+1==y for x, y in zip(unique_power, unique_power[1:])
+                      ) and len(unique_power)>1):
+                    phoenix_used = False
+                    is_pair_equal = True
+                    is_pair_unequal = True
+                    # check for phoenix use in unequal card list index
+                    toggle = 1
+                    antitoggle = 0
+                    for i in range(1,len(self.cards)-1):
+                        if (i%2 == toggle and
+                              self.cards[i].power == self.cards[i+1].power):
+                            pass
+                        elif (i%2 == antitoggle and
+                              self.cards[i].power + 1 == self.cards[i+1].power):
+                            if i+1 >= len(self.cards)-1 and not phoenix_used:
+                                # phoenix used as the highest pair of sequence
+                                phoenix_used = True
+                        elif phoenix_used: # phoenix cannot be used twice
+                            is_pair_unequal = False
+                            break
+                        else:
+                            # if phoenix is used in the middle of the sequence,
+                            # change matching behavior of toggle/antitoggle
+                            # so that i%2 matches next element
+                            phoenix_used = True
+                            toggle = 0
+                            antitoggle = 1
+                    # check for phoenix use in equal card list index
+                    if not is_pair_unequal:
+                        phoenix_used = False
+                        for i in range(1,len(self.cards)-1):
+                            if (i%2 == 0 and
+                                  self.cards[i].power == self.cards[i+1].power):
+                                pass
+                            elif (i%2 == 1 and
+                                  self.cards[i].power+1 == self.cards[i+1].power):
+                                # check if phoenix is first card in sequence
+                                if i == 1:
+                                    phoenix_used = True
+                            elif phoenix_used: # phoenix cannot be used twice
+                                is_pair_equal = False
+                                break
+                            else:
+                                phoenix_used = True
+                    if is_pair_unequal or is_pair_equal:
+                        self.type = 'pair_seq'
+                        self.power = self.cards[-1].power
 
     def __add__(self, card_list_to_add):
         this_card_list = self.cards
