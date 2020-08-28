@@ -288,12 +288,12 @@ class Game():
             self.players[teammate].set_points(100)
             self.players[opponents[0]].set_points(0)
             self.players[opponents[1]].set_points(0)
-            # Add Tichu points to double victory
+            # Add individual Tichu points to player score
+            self.players[player_id].add_points(self.tichu_points[player_id])
+            self.players[teammate].add_points(self.tichu_points[teammate])
+            # Set points this step to double victory points + tichu points
             tichu_points = (self.tichu_points[player_id]
                             + self.tichu_points[teammate])
-            self.players[player_id].add_points(tichu_points)
-            self.players[teammate].add_points(tichu_points)
-            # Set points this step to double victory points + tichu points
             points_this_step[player_id] = 200 + tichu_points
             points_this_step[teammate] = 200 + tichu_points
             points_this_step[opponents[0]] = 0
