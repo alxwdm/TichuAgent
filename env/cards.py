@@ -330,7 +330,7 @@ class Cards():
               for crd in self.cards)) and
               self.phoenix_flag):
             return
-        # return if card sequence without Phoenix does not increase by 1
+        # return if card sequence (excluding Phoenix) does not increase by 1
         unique_power = sorted({crd.power for crd in self.cards})
         unique_power.pop(0) # remove phoenix from set
         if not (all(x+1==y for x, y in zip(unique_power, unique_power[1:])
@@ -590,8 +590,6 @@ class Cards():
                 else:
                     break
         return pair_seq
-
-
 
     def __add__(self, card_list_to_add):
         this_card_list = self.cards
