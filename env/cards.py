@@ -427,52 +427,47 @@ class Cards():
 
     def _get_available_triple(self):
         """ Returns a list with all possible triple combinations. """
+        def check_and_append_triple(cards_list, triple):
+            triple_cards = Cards(cards_list)
+            if triple_cards.type == 'triple':
+                triple.append(triple_cards)
+            return triple
         triple = list()
         for i in range(len(self.cards)-2):
             # regular triple
             if (self.cards[i].power == self.cards[i+1].power and
                 self.cards[i+1].power == self.cards[i+2].power):
-                triple_list = [self.cards[i], self.cards[i+1], self.cards[i+2]]
-                triple_cards = Cards(triple_list)
-                if triple_cards.type == 'triple':
-                    triple.append(triple_cards)
+                triple_candidate = [self.cards[i], self.cards[i+1],
+                                    self.cards[i+2]]
+                triple = check_and_append_triple(triple_candidate, triple)
             # phoenix triple
             if (self.phoenix_flag and
                   self.cards[i+1].power == self.cards[i+2].power):
-                triple_list = [self.cards[0], self.cards[i+1], self.cards[i+2]]
-                triple_cards = Cards(triple_list)
-                if triple_cards.type == 'triple':
-                    triple.append(triple_cards)
+                triple_candidate = [self.cards[0], self.cards[i+1],
+                                    self.cards[i+2]]
+                triple = check_and_append_triple(triple_candidate, triple)
             # multiple triples
             try:
                 if (self.cards[i].power == self.cards[i+1].power and
                       self.cards[i+1].power == self.cards[i+3].power):
-                    triple_list = [self.cards[i], self.cards[i+1],
-                                   self.cards[i+3]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
+                    triple_candidate = [self.cards[i], self.cards[i+1],
+                                        self.cards[i+3]]
+                    triple = check_and_append_triple(triple_candidate, triple)
                 if (self.cards[i].power == self.cards[i+2].power and
                       self.cards[i+2].power == self.cards[i+3].power):
-                    triple_list = [self.cards[i], self.cards[i+2],
-                                   self.cards[i+3]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
+                    triple_candidate = [self.cards[i], self.cards[i+2],
+                                        self.cards[i+3]]
+                    triple = check_and_append_triple(triple_candidate, triple)
                 if (self.phoenix_flag and
                       self.cards[i+1].power == self.cards[i+3].power):
-                    triple_list = [self.cards[0], self.cards[i+1],
-                                   self.cards[i+3]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
+                    triple_candidate = [self.cards[0], self.cards[i+1],
+                                        self.cards[i+3]]
+                    triple = check_and_append_triple(triple_candidate, triple)
                 if (self.phoenix_flag and
                       self.cards[i+1].power == self.cards[i+4].power):
-                    triple_list = [self.cards[0], self.cards[i+1],
-                                   self.cards[i+4]]
-                    triple_cards = Cards(triple_list)
-                    if triple_cards.type == 'triple':
-                        triple.append(triple_cards)
+                    triple_candidate = [self.cards[0], self.cards[i+1],
+                                        self.cards[i+4]]
+                    triple = check_and_append_triple(triple_candidate, triple)
             except IndexError:
                 pass
         return triple
@@ -509,6 +504,16 @@ class Cards():
 
     def _get_available_straight(self):
         """ Returns a list with all possible straight combinations. """
+        def check_candidate(candidate_list, straight, straight_bomb):
+            if len(candidate_list) > 4:
+                straight_cards = Cards(candidate_list)
+                if straight_cards.type == 'straight':
+                    straight.append(straight_cards)
+                elif straight_cards.type == 'straight_bomb':
+                    straight_bomb.append(straight_cards)
+                else:
+                    pass
+            return straight, straight_bomb
         straight = list()
         straight_bomb = list()
         for i in range(len(self.cards)-4):
@@ -523,23 +528,13 @@ class Cards():
                 # no check if Phoenix is last entry
                 elif candidate_list[-1].name == 'Phoenix':
                     candidate_list.append(self.cards[j])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
-                        else:
-                            pass
+                    straight, straight_bomb = check_candidate(candidate_list,
+                        straight, straight_bomb)
                 # add subsequent cards
                 elif candidate_list[-1].power+1 == self.cards[j].power:
                     candidate_list.append(self.cards[j])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
-                        elif straight_cards.type == 'straight_bomb':
-                            straight_bomb.append(straight_cards)
-                        else:
-                            pass
+                    straight, straight_bomb = check_candidate(candidate_list,
+                        straight, straight_bomb)
                 # skip pairs
                 elif candidate_list[-1].power == self.cards[j].power:
                     pass
@@ -548,18 +543,14 @@ class Cards():
                     candidate_list[-1].power+2 == self.cards[j].power):
                     candidate_list.append(self.cards[0])
                     candidate_list.append(self.cards[j])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
+                    straight, straight_bomb = check_candidate(candidate_list,
+                        straight, straight_bomb)
                     phoenix_available = False
                 # use phoenix as first/last card if available
                 elif phoenix_available:
                     candidate_list.append(self.cards[0])
-                    if len(candidate_list) > 4:
-                        straight_cards = Cards(candidate_list)
-                        if straight_cards.type == 'straight':
-                            straight.append(straight_cards)
+                    straight, straight_bomb = check_candidate(candidate_list,
+                        straight, straight_bomb)
                     phoenix_available = False
                 # no straight possible
                 else:
