@@ -65,11 +65,12 @@ class Game():
                 self.players[i].hand.show()
         # Create empty stack
         self.stack = Stack()
-        # Game managing parameter
+        # Determine active player and set game managing parameter
         for i in range(4):
             for crd in self.players[i].hand.cards:
+                # Player with Majong starts
                 if crd.name == 'Majong':
-                    self.active_player = i # Player with Majong starts
+                    self.active_player = i
         self.leading_player = None
         self.players_finished = list()
         self.pass_counter = 0
@@ -100,173 +101,20 @@ class Game():
         - iterates active player token
         - checks if game is finished
         """
+        dispatch_move = {True: self._pass_routine,
+                         False: self._play_routine}
         points_this_step = [0, 0, 0, 0]
+        # check if action is by active player
         if not player_id == self.active_player:
             if self.verbose > 0:
                 print(
                   'Player {0} tried to make a move, but active player is {1}.'
                   .format(player_id, self.active_player))
             return False, points_this_step
-        # active player passes
-        if cards.type == 'pass':
-            if self.verbose > 0:
-                print('Player {0} passes'.format(player_id))
-            self.pass_counter += 1
-            # stack is finished when 3 players have passed
-            if self.pass_counter >= 3:
-                # if stack contains Dragon it must be given to opponent player
-                if self.stack.dragon_flag:
-                    points_this_step = self._dragon_stack()
-                else:
-                    self.players[self.leading_player].add_points(
-                        self.stack.points)
-                    points_this_step[self.leading_player] = self.stack.points
-                # initialize new round
-                self.stack = Stack()
-                # transmit leading player if player has finished
-                # (but do not skip finished players from being active)
-                if not self.leading_player in self.players_finished:
-                    self.active_player = self.leading_player
-                elif not (self.leading_player+1)%4 in self.players_finished:
-                    self.leading_player = (self.leading_player+1)%4
-                    self.active_player = self.leading_player
-                elif not (self.leading_player+2)%4 in self.players_finished:
-                    self.leading_player = (self.leading_player+2)%4
-                    self.active_player = self.leading_player
-                else:
-                    self.leading_player = (self.leading_player+3)%4
-                    self.active_player = self.leading_player
-                self.pass_counter = 0
-            # stack not finished, next players turn
-            else:
-                self.active_player = (player_id+1)%4
-            return True, points_this_step
-        # active player plays cards
-        else:
-            # check if cards to play is in hands of player
-            suc1 = self.players[player_id].move(cards)
-            # try to add cards to current stack
-            suc2 = self.stack.add(cards)
-            if suc1 and suc2:
-                # determine next active player
-                if cards.cards[0].name == 'Dog':
-                    teammate = self._get_teammate(player_id)
-                    if not teammate in self.players_finished:
-                        self.active_player = teammate
-                        self.leading_player = teammate
-                    elif not (teammate+1)%4 in self.players_finished:
-                        self.active_player = (teammate+1)%4
-                        self.leading_player = (teammate+1)%4
-                    elif not ((self.leading_player+2)%4
-                              in self.players_finished):
-                        self.active_player = (teammate+2)%4
-                        self.leading_player = (teammate+2)%4
-                    else:
-                        self.active_player = (teammate+3)%4
-                        self.leading_player = (teammate+3)%4
-                    self.stack = Stack()
-                else:
-                    self.leading_player = player_id
-                    self.active_player = (player_id+1)%4
-                suc = self.players[player_id].remove_cards(cards)
-                if not suc: # This should never happen!
-                    print('Could not remove players cards.')
-                    return False, points_this_step
-                self.pass_counter = 0
-                if self.verbose > 0:
-                    print('Player {0} plays {1}.'.format(
-                            player_id, cards.type))
-                    cards.show()
-                # check if player and game is finished
-                if self.players[player_id].finished:
-                    if self.verbose > 0:
-                        print(
-                          'Player {0} has finished on position {1}!'
-                          .format(player_id, len(self.players_finished)+1))
-                    self.players_finished.append(player_id)
-                    if not cards.cards[0].name == 'Dog':
-                        self.active_player = (player_id+1)%4
-                    # check if double-team victory (stack points do not count)
-                    if (len(self.players_finished) == 2 and
-                          sum(self.players_finished)%2 == 0):
-                        if self.verbose > 0:
-                            print(
-                              'Double team victory by players {0} and {1}!'
-                              .format(self.players_finished[0],
-                                      self.players_finished[1]))
-                        opponents = self._get_opponents()
-                        teammate = self._get_teammate()
-                        self.players[player_id].set_points(100)
-                        self.players[teammate].set_points(100)
-                        self.players[opponents[0]].set_points(0)
-                        self.players[opponents[1]].set_points(0)
-                        # Add Tichu points to double victory
-                        for i in range(4):
-                            tichu_points = self.tichu_points[i]
-                            self.players[i].add_points(tichu_points)
-                        points_this_step[player_id] = 200
-                        points_this_step[teammate] = 200
-                        points_this_step[opponents[0]] = 0
-                        points_this_step[opponents[1]] = 0
-                        self.game_finished = True
-                    # check if regular game end
-                    if len(self.players_finished) == 3:
-                        self.game_finished = True
-                        # if last stack is dragon stack
-                        if self.stack.dragon_flag:
-                            points_this_step = self._dragon_stack()
-                        # get first and last finisher
-                        first = self.players_finished[0]
-                        for i in range(4):
-                            if not self.players[i].finished:
-                                last = i
-                        # opponent team gets hand of last finisher
-                        hand_points_last = self.players[last].hand.points
-                        opponents = self._get_opponents(pid=last)
-                        self.players[opponents[0]].add_points(
-                                                     hand_points_last)
-                        points_this_step[opponents[0]] = hand_points_last
-                        # first finisher gets stack of last finisher
-                        stack_points_last = self.players[last].points
-                        self.players[first].add_points(stack_points_last)
-                        points_this_step[first] += stack_points_last
-                        self.players[last].set_points(0)
-                        points_this_step[last] = 0
-                    # check if any Tichu call was successfull / not succesfull
-                    for i in range(4):
-                        if self.players[i].tichu_flag:
-                            if ((len(self.players_finished) == 1) and
-                                  self.players[i].finished):
-                                self.players[i].add_points(100)
-                                self.tichu_points[i] = 100
-                                points_this_step[i] += 100
-                                if self.verbose > 0:
-                                    print('Successfull Tichu by player {0}!'
-                                      .format(i))
-                            else:
-                                self.players[i].add_points(-100)
-                                self.tichu_points[i] = -100
-                                points_this_step[i] -= 100
-                                if self.verbose > 0:
-                                    print(
-                                      'Tichu by player {0} was not successfull!'
-                                      .format(i))
-                            # undo Tichu flag
-                            # (avoids points are added more than once)
-                            self.players[i].tichu_flag = False
-                    if self.game_finished == True and self.verbose > 0:
-                        print('-----')
-                        print('Game is finished!')
-                        print('Score of player 0 and player 2: {0}'.format(
-                            (self.players[0].points+self.players[2].points)))
-                        print('Score of player 1 and player 3: {0}'.format(
-                            (self.players[1].points+self.players[3].points)))
-                return True, points_this_step
-            # invalid move
-            else:
-                if self.verbose > 1:
-                    print('Invalid move by player {0}'.format(player_id))
-                return False, points_this_step
+        # call either pass or play routine
+        suc, points_this_step = dispatch_move[cards.type == 'pass'](
+            player_id, cards)
+        return suc, points_this_step
 
     def show_hands(self, pid=None):
         """ Prints current hand cards of pid. """
@@ -300,6 +148,194 @@ class Game():
             return 0
         else:
             return 1
+
+    def _pass_routine(self, player_id, *unused_args):
+        """ Changes game state when active player passes. """
+        dispatch_pass = {True: self._stack_finished_routine,
+                         False: self._stack_continues_routine}
+        if self.verbose > 0:
+            print('Player {0} passes'.format(player_id))
+        # increment pass counter
+        self.pass_counter += 1
+        # if 3 players have passed, stack is finished
+        points_this_step = dispatch_pass[self.pass_counter>=3](player_id)
+        return True, points_this_step
+
+    def _stack_finished_routine(self, *unused_args):
+        """ Changes game state when stack is won by a player. """
+        points_this_step = [0, 0, 0, 0]
+        # if stack contains Dragon it must be given to opponent player
+        if self.stack.dragon_flag:
+            points_this_step = self._dragon_stack()
+        else:
+        # else, stack points belong to leading player
+            self.players[self.leading_player].add_points(
+                self.stack.points)
+            points_this_step[self.leading_player] = self.stack.points
+        # initialize new round
+        self.stack = Stack()
+        # determine next active and leading player:
+        #   if stack winner has not finished, he is next active player
+        #   else pass the leading token around, but
+        #   do not skip finished players from being active,
+        #   they auto-pass to keep the game logic consistent
+        if not self.leading_player in self.players_finished:
+            self.active_player = self.leading_player
+        elif not (self.leading_player+1)%4 in self.players_finished:
+            self.leading_player = (self.leading_player+1)%4
+            self.active_player = self.leading_player
+        elif not (self.leading_player+2)%4 in self.players_finished:
+            self.leading_player = (self.leading_player+2)%4
+            self.active_player = self.leading_player
+        else:
+            self.leading_player = (self.leading_player+3)%4
+            self.active_player = self.leading_player
+        self.pass_counter = 0
+        return points_this_step
+
+    def _stack_continues_routine(self, player_id):
+        """ ‚Changes game state when stack is still playable. """
+        points_this_step = [0, 0, 0, 0]
+        self.active_player = (player_id+1)%4
+        return points_this_step
+
+    def _play_routine(self, player_id, cards):
+        """ Changes game state when active player plays cards. """
+        points_this_step = [0, 0, 0, 0]
+        dispatch_valid_move = {True: self._valid_move_routine,
+                               False: self._invalid_move_routine}
+        # plausibility check: cards in hand of player and matches stack type
+        suc1 = self.players[player_id].move(cards)
+        suc2 = self.stack.add(cards)
+        suc, points_this_step = dispatch_valid_move[(suc1 and suc2)](
+            player_id, cards)
+        return suc, points_this_step
+
+    def _valid_move_routine(self, player_id, cards):
+        """ Changes game state when player move is valid. """
+        points_this_step = [0, 0, 0, 0]
+        # determine next active player
+        if cards.cards[0].name == 'Dog':
+            teammate = self._get_teammate(player_id)
+            if not teammate in self.players_finished:
+                self.active_player = teammate
+                self.leading_player = teammate
+            elif not (teammate+1)%4 in self.players_finished:
+                self.active_player = (teammate+1)%4
+                self.leading_player = (teammate+1)%4
+            elif not ((self.leading_player+2)%4
+                      in self.players_finished):
+                self.active_player = (teammate+2)%4
+                self.leading_player = (teammate+2)%4
+            else:
+                self.active_player = (teammate+3)%4
+                self.leading_player = (teammate+3)%4
+            self.stack = Stack()
+        else:
+            self.leading_player = player_id
+            self.active_player = (player_id+1)%4
+        suc = self.players[player_id].remove_cards(cards)
+        if not suc: # This should never happen!
+            print('Could not remove players cards.')
+            return False, points_this_step
+        self.pass_counter = 0
+        if self.verbose > 0:
+            print('Player {0} plays {1}.'.format(
+                    player_id, cards.type))
+            cards.show()
+        # check if player and game is finished
+        if self.players[player_id].finished:
+            if self.verbose > 0:
+                print(
+                  'Player {0} has finished on position {1}!'
+                  .format(player_id, len(self.players_finished)+1))
+            self.players_finished.append(player_id)
+            if not cards.cards[0].name == 'Dog':
+                self.active_player = (player_id+1)%4
+            # check if double-team victory (stack points do not count)
+            if (len(self.players_finished) == 2 and
+                  sum(self.players_finished)%2 == 0):
+                if self.verbose > 0:
+                    print(
+                      'Double team victory by players {0} and {1}!'
+                      .format(self.players_finished[0],
+                              self.players_finished[1]))
+                opponents = self._get_opponents()
+                teammate = self._get_teammate()
+                self.players[player_id].set_points(100)
+                self.players[teammate].set_points(100)
+                self.players[opponents[0]].set_points(0)
+                self.players[opponents[1]].set_points(0)
+                # Add Tichu points to double victory
+                for i in range(4):
+                    tichu_points = self.tichu_points[i]
+                    self.players[i].add_points(tichu_points)
+                points_this_step[player_id] = 200
+                points_this_step[teammate] = 200
+                points_this_step[opponents[0]] = 0
+                points_this_step[opponents[1]] = 0
+                self.game_finished = True
+            # check if regular game end
+            if len(self.players_finished) == 3:
+                self.game_finished = True
+                # if last stack is dragon stack
+                if self.stack.dragon_flag:
+                    points_this_step = self._dragon_stack()
+                # get first and last finisher
+                first = self.players_finished[0]
+                for i in range(4):
+                    if not self.players[i].finished:
+                        last = i
+                # opponent team gets hand of last finisher
+                hand_points_last = self.players[last].hand.points
+                opponents = self._get_opponents(pid=last)
+                self.players[opponents[0]].add_points(
+                                             hand_points_last)
+                points_this_step[opponents[0]] = hand_points_last
+                # first finisher gets stack of last finisher
+                stack_points_last = self.players[last].points
+                self.players[first].add_points(stack_points_last)
+                points_this_step[first] += stack_points_last
+                self.players[last].set_points(0)
+                points_this_step[last] = 0
+            # check if any Tichu call was successfull / not succesfull
+            for i in range(4):
+                if self.players[i].tichu_flag:
+                    if ((len(self.players_finished) == 1) and
+                          self.players[i].finished):
+                        self.players[i].add_points(100)
+                        self.tichu_points[i] = 100
+                        points_this_step[i] += 100
+                        if self.verbose > 0:
+                            print('Successfull Tichu by player {0}!'
+                              .format(i))
+                    else:
+                        self.players[i].add_points(-100)
+                        self.tichu_points[i] = -100
+                        points_this_step[i] -= 100
+                        if self.verbose > 0:
+                            print(
+                              'Tichu by player {0} was not successfull!'
+                              .format(i))
+                    # undo Tichu flag
+                    # (avoids points are added more than once)
+                    self.players[i].tichu_flag = False
+            if self.game_finished and self.verbose > 0:
+                print('-----')
+                print('Game is finished!')
+                print('Score of player 0 and player 2: {0}'.format(
+                    (self.players[0].points+self.players[2].points)))
+                print('Score of player 1 and player 3: {0}'.format(
+                    (self.players[1].points+self.players[3].points)))
+        return True, points_this_step
+
+
+    def _invalid_move_routine(self, player_id, *unused_args):
+        points_this_step = [0, 0, 0, 0]
+        if self.verbose > 1:
+            print('Invalid move by player {0}'.format(player_id))
+        return False, points_this_step
+
 
     def _dragon_stack(self):
         """
