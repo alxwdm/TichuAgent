@@ -11,24 +11,24 @@ full house, straight, etc.) upon a stack. Any valid combination may be
 played upon an empty stack, but the following players must either play
 the same type of combination with higher power upon the stack, or pass.
 If all other players can not or do not want to play a higher combination
-upon a stack, the stack (and all including points) goes to the player 
+upon a stack, the stack (and all including points) goes to the player
 that has played the highest combination so far and the stack is emptied.
 The game ends when only one player is remaining or the two teammates
 have finished first and second, respectively (i.e. a "double victory").
 The last player looses all points by giving their stacks to the first
 finisher (who may be their teammate) and the remaining hand cards to the
 opposing team.
-Only few cards give points, namely: 5's give 5 points, 10's and Kings 
-give 10 points. There are four special cards, two of which are the 
+Only few cards give points, namely: 5's give 5 points, 10's and Kings
+give 10 points. There are four special cards, two of which are the
 Dragon (who gives +25 points, but the stack must be given to a player of
 the opposing team) and the Phoenx (-25 points, but serves as a joker).
 In case of a double victory, the winning team gets 200 points. In case
 of a regular game end, the stack points of either team are added in
-order to determine the winner. 
+order to determine the winner.
 Usually, the points are accumulated until 1000 total points are reached.
 A player can call "Tichu" if they has not played any hand cards yet. In
 doing so, they announces to finish first. A succesfull Tichu is worth
-100 additional points, but yields the danger of loosing 100 points if 
+100 additional points, but yields the danger of loosing 100 points if
 the player who made the Tichu call does not finish first.
 
 This Python implementation of Tichu is wrapped into an environment that
