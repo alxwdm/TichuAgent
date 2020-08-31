@@ -1,6 +1,7 @@
 """
 DDPG Agent for Reinforcement Learning
 
+Modified version for TichuAgent project
 >> Paper: https://arxiv.org/abs/1509.02971
 >> Source: https://github.com/alxwdm/DRLND_projects
 """
@@ -14,7 +15,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 from model import Actor, Critic
-from ./utils import ReplayBuffer, OUNoise # TODO
+from ./utils/replay_buffer import DequeReplayBuffer
 
 # Hyperparameter
 # -- Replay Buffer ------
@@ -76,13 +77,9 @@ class DDPGAgent():
                                            lr=LR_CRITIC,
                                            weight_decay=WEIGHT_DECAY)
 
-        # Noise process
-        self.noise = OUNoise(action_size, random_seed)
-        self.epsilon = EPSILON
-
         # Replay memory
-        self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE,
-                                   random_seed)
+        self.memory = DequeReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE,
+                                        random_seed)
     
     def step(self, state, action, reward, next_state, done, timestep):
         """
@@ -115,17 +112,14 @@ class DDPGAgent():
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
 
-    def act(self, state, add_noise=True):
+    def act(self, state):
         """ Returns actions for given state as per current policy. """
         state = torch.from_numpy(state).float().to(device)
         self.actor_local.eval()
         with torch.no_grad():
             action = self.actor_local(state).cpu().data.numpy()
         self.actor_local.train()
-        if add_noise:
-            action += self.epsilon * self.noise.sample()
-            self.epsilon *= EPSILON_DECAY
-        return np.clip(action, -1, 1)
+        return np.rint(action)
 
     def reset(self):
         """ Resets UO-noise process. """
