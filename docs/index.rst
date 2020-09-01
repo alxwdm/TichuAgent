@@ -13,10 +13,10 @@ The goals of this project are:
 Usage
 -----
 
-It is recommended to clone the whole repository:
+It is recommended to clone the whole repository::
     !git clone https://github.com/alxwdm/tichuagent
     
-If you want to train your own agents, you can create and interact with the environment:
+If you want to train your own agents, you can create and interact with the environment::
     env = Env()
     state, rewards, done, active_player = env.reset()
     (...)
