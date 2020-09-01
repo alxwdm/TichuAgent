@@ -14,13 +14,15 @@ Usage
 -----
 
 It is recommended to clone the whole repository::
-    !git clone https://github.com/alxwdm/tichuagent
+
+     !git clone https://github.com/alxwdm/tichuagent
     
 If you want to train your own agents, you can create and interact with the environment::
-    env = Env()
-    state, rewards, done, active_player = env.reset()
-    (...)
-    state, rewards, done, active_player = env.step(active_player, action)
+
+     env = Env()
+     state, rewards, done, active_player = env.reset()
+     (...)
+     state, rewards, done, active_player = env.step(active_player, action)
 
 Contents
 ========
