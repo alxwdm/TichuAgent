@@ -5,6 +5,7 @@ Tichu is a card game where four players in two opposing teams try to win by accu
 The combination of collaborative and competitive aspects of the game makes it a challenging task for reinforcement learning (RL).
 
 The goals of this project are:
+
 * Implement an environment of Tichu that enables RL-methods,
 * Make agents learn (and possibly master) the game using different RL-approaches,
 * Let the agents compete against rule-based, non-AI agents and humans.
@@ -12,10 +13,10 @@ The goals of this project are:
 Usage
 -----
 
-It is recommended to clone the whole repository::
+It is recommended to clone the whole repository:
     !git clone https://github.com/alxwdm/tichuagent
     
-If you want to train your own agents, you can create and interact with the environment::
+If you want to train your own agents, you can create and interact with the environment:
     env = Env()
     state, rewards, done, active_player = env.reset()
     (...)
