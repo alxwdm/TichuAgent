@@ -43,7 +43,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class DDPGAgent():
     """ An agent that interacts with and learns from the environment. """
     
-    def __init__(self, state_size, action_size, random_seed):
+    def __init__(self, state_size, action_size, random_seed, heuristic_agent):
         """
         Initializes an Agent object.
         
@@ -59,6 +59,7 @@ class DDPGAgent():
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
+        self.heuristic_agent = heuristic_agent
 
         # Actor Network (w/ Target Network)
         self.actor_local = Actor(state_size, action_size, random_seed,
@@ -102,7 +103,6 @@ class DDPGAgent():
         """
         # Save experience (state, action, reward, next_state, done) tuple
         self.memory.add(state, action, reward, next_state, done)
-
         # Learning process:
         # >> 1) learn if enough samples are available in memory
         # >> 2) learn every LEARN_EVERY timesteps
@@ -112,13 +112,16 @@ class DDPGAgent():
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
 
-    def act(self, state):
+    def act(self, state, eps):
         """ Returns actions for given state as per current policy. """
-        state = torch.from_numpy(state).float().to(device)
-        self.actor_local.eval()
-        with torch.no_grad():
-            action = self.actor_local(state).cpu().data.numpy()
-        self.actor_local.train()
+        if random.random() > eps:
+            state = torch.from_numpy(state).float().to(device)
+            self.actor_local.eval()
+            with torch.no_grad():
+                action = self.actor_local(state).cpu().data.numpy()
+            self.actor_local.train()
+        else:
+            action = self.heuristic_agent.act(state)
         return np.rint(action)
 
     def reset(self):
