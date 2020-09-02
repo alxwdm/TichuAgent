@@ -14,8 +14,8 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from model import Actor, Critic
-from ./utils/replay_buffer import DequeReplayBuffer
+from agents.ddpg.model import Actor, Critic
+from agents.utils.replay_buffer import DequeReplayBuffer
 
 # Hyperparameter
 # -- Replay Buffer ------
@@ -101,6 +101,8 @@ class DDPGAgent():
         timestep:
           timestep of this episode
         """
+        # flatten state
+        state = self._flatten_state(state)
         # Save experience (state, action, reward, next_state, done) tuple
         self.memory.add(state, action, reward, next_state, done)
         # Learning process:
@@ -115,10 +117,11 @@ class DDPGAgent():
     def act(self, state, eps):
         """ Returns actions for given state as per current policy. """
         if random.random() > eps:
-            state = torch.from_numpy(state).float().to(device)
+            np_state = self._flatten_state(state)
+            torch_state = torch.from_numpy(np_state).float().to(device)
             self.actor_local.eval()
             with torch.no_grad():
-                action = self.actor_local(state).cpu().data.numpy()
+                action = self.actor_local(torch_state).cpu().data.numpy()
             self.actor_local.train()
         else:
             action = self.heuristic_agent.act(state)
@@ -213,3 +216,15 @@ class DDPGAgent():
         self.critic_local.load_state_dict(checkpoint['critic_state_dict'])
         self.epsilon = checkpoint['current_epsilon']
         print(filepath + ' successfully loaded.')
+
+    def _flatten_state(self, state):
+        """ A very ugly state flattening function. TODO! """
+        flattened_list = [item for sublist in state for item in sublist]
+        flattened_state = []
+        for elem in flattened_list:
+            if type(elem) != list:
+                flattened_state.append(elem)
+            else:
+                for e in elem:
+                    flattened_state.append(e)
+        return np.asarray(flattened_state, dtype='int32')

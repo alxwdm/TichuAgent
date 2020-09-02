@@ -54,8 +54,8 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """ Build a policy network that maps states -> actions. """
-        x = F.relu(self.bn1(self.fc1(state)))
-        x = F.relu(self.bn2(self.fc2(x)))
+        x = F.relu(self.fc1(state))
+        x = F.relu(self.fc2(x))
         return F.sigmoid(self.fc3(x))
 
 class Critic(nn.Module):

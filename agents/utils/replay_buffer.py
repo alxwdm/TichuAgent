@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import random
 
-from segment_tree import SumSegmentTree, MinSegmentTree
+from agents.utils.segment_tree import SumSegmentTree, MinSegmentTree
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -103,7 +103,7 @@ class HelperReplayBuffer(object):
             rewards.append(reward)
             obses_tp1.append(np.array(obs_tp1, copy=False))
             dones.append(done)
-        return np.array(obses_t), np.array(actions), np.array(rewards),
+        return np.array(obses_t), np.array(actions), np.array(rewards), \
                np.array(obses_tp1), np.array(dones)
 
     def sample(self, batch_size):
@@ -232,13 +232,13 @@ class PrioritizedReplayBuffer(HelperReplayBuffer):
         encoded_sample = self._encode_sample(idxes)
         experiences = tuple(list(encoded_sample) + [weights, idxes])
         # Unpack experiences for conversion to torch tensors
-        states, actions, rewards, next_states,
-          dones, weights, idxes = experiences
+        states, actions, rewards, next_states, dones, weights, idxes = \
+            experiences
         states = torch.from_numpy(states).float().to(device)
         actions = torch.from_numpy(actions).unsqueeze(1).long().to(device)
         rewards = torch.from_numpy(rewards).float().unsqueeze(1).to(device)
         next_states = torch.from_numpy(next_states).float().to(device)
-        dones = torch.from_numpy(dones.astype(np.uint8)).unsqueeze(1)
+        dones = torch.from_numpy(dones.astype(np.uint8)).unsqueeze(1) \
                                                         .float().to(device)
         weights = torch.from_numpy(weights).unsqueeze(1).float().to(device)
         return (states, actions, rewards, next_states, dones, weights, idxes)
