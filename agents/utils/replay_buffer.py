@@ -54,7 +54,7 @@ class DequeReplayBuffer:
         # Match experiences shape for PER
         weights = 1
         idxes = 0
-        return (states, actions, rewards, next_states, dones, weights, idxes)
+        return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
         """ Return the current size of internal memory. """

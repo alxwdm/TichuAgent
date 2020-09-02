@@ -101,8 +101,9 @@ class DDPGAgent():
         timestep:
           timestep of this episode
         """
-        # flatten state
+        # flatten states
         state = self._flatten_state(state)
+        next_state = self._flatten_state(next_state)
         # Save experience (state, action, reward, next_state, done) tuple
         self.memory.add(state, action, reward, next_state, done)
         # Learning process:
