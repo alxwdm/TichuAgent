@@ -110,7 +110,10 @@ class Env():
         self.action_size = 56
         self.all_cards = Deck().all_cards
         self.game = None
-        self.action_buffer = [[None], [None], [None], [None]]
+        self.action_buffer = [np.zeros(len(self.all_cards), int).tolist(),
+                              np.zeros(len(self.all_cards), int).tolist(),
+                              np.zeros(len(self.all_cards), int).tolist(),
+                              np.zeros(len(self.all_cards), int).tolist()]
         self.state = [[None], [None], [None], [None]]
         self.rewards = [None, None, None, None]
         self.done = False
@@ -231,7 +234,7 @@ class Env():
 
     def _update_action_buffer(self, player_id, action):
         """ Updates the action buffer. """
-        self.action_buffer[player_id] = action
+        self.action_buffer[player_id] = action.tolist()
 
     def _reset_rewards(self):
         """ Resets the rewards to 0. """
