@@ -95,7 +95,8 @@ class Env():
 
         Parameter
         ---------
-        train_mode: If false, verbosity of Game will be set to 1.
+        train_mode: bool
+          If false, verbosity of Game will be set to 1.
         """
         # dispatch table for reward function
         self.dispatch_reward = {'rich': self._update_rich_rewards,
@@ -174,6 +175,10 @@ class Env():
         done = self.done
         active_player = self.game.active_player
         return state, rewards, done, active_player
+
+    def info(self):
+        """ Outputs size of state and action dimension. """
+        return self.state_size, self.action_size
 
     def _reset_all_states(self):
         """
