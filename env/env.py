@@ -123,6 +123,7 @@ class Env():
         """ Resets the Environment. """
         self.game = Game(verbose=self.verbose)
         self._reset_all_states()
+        self._reset_action_buffer()
         self._reset_rewards()
         self.done = False
         state = self.state
