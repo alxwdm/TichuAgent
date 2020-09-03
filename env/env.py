@@ -110,10 +110,7 @@ class Env():
         self.action_size = 56
         self.all_cards = Deck().all_cards
         self.game = None
-        self.action_buffer = [np.zeros(len(self.all_cards), int).tolist(),
-                              np.zeros(len(self.all_cards), int).tolist(),
-                              np.zeros(len(self.all_cards), int).tolist(),
-                              np.zeros(len(self.all_cards), int).tolist()]
+        self.action_buffer = [[None], [None], [None], [None]]
         self.state = [[None], [None], [None], [None]]
         self.rewards = [None, None, None, None]
         self.done = False
