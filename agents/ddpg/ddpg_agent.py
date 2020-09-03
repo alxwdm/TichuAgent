@@ -198,7 +198,6 @@ class DDPGAgent():
     def save_checkpoint(self, filename='checkpoint'):
         checkpoint = {'action_size': self.action_size,
                       'state_size': self.state_size,
-                      'current_epsilon': self.epsilon,
                       'actor_state_dict': self.actor_local.state_dict(),
                       'critic_state_dict': self.critic_local.state_dict()}
         filepath = filename + '.pth'
@@ -215,7 +214,6 @@ class DDPGAgent():
                                    seed=42).to(device)
         self.actor_local.load_state_dict(checkpoint['actor_state_dict'])
         self.critic_local.load_state_dict(checkpoint['critic_state_dict'])
-        self.epsilon = checkpoint['current_epsilon']
         print(filepath + ' successfully loaded.')
 
     def _flatten_state(self, state):
