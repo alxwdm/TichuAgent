@@ -49,7 +49,7 @@ class greedyAgent():
         # else try to beat opponent 
         else:
             # determine leading opponent type and power
-            if (opp_cards_0.power > opp_cards_0.power) or (opp_cards_1.type == 'pass'):
+            if (opp_cards_0.power > opp_cards_1.power) or (opp_cards_1.type == 'pass'):
                 leading_type = opp_cards_0.type
                 leading_size = opp_cards_0.size
                 leading_power = opp_cards_0.power
