@@ -152,13 +152,21 @@ class Game():
         """ Changes game state when active player passes. """
         dispatch_pass = {True: self._stack_finished_routine,
                          False: self._stack_continues_routine}
+        points_this_step = [0, 0, 0, 0]
         if self.verbose > 0:
             print('Player {0} passes'.format(player_id))
-        # increment pass counter
-        self.pass_counter += 1
-        # if 3 players have passed, stack is finished
-        points_this_step = dispatch_pass[self.pass_counter>=3](player_id)
-        return True, points_this_step
+        # check if pass is valid (i.e. stack not empty)
+        if not self.stack.cards:
+            suc = False
+            if self.verbose > 1:
+                print('Pass not possible, stack is empty!')
+        else:
+            suc = True
+            # increment pass counter
+            self.pass_counter += 1
+            # if 3 players have passed, stack is finished
+            points_this_step = dispatch_pass[self.pass_counter>=3](player_id)
+        return suc, points_this_step
 
     def _stack_finished_routine(self, *unused_args):
         """ Changes game state when stack is won by a player. """
@@ -205,7 +213,7 @@ class Game():
                                False: self._invalid_move_routine}
         # plausibility check: cards in hand of player and matches stack type
         suc1 = self.players[player_id].move(cards)
-        suc2 = self.stack.add(cards)
+        suc2 = self.stack.assert_valid_move(cards)
         suc, points_this_step = dispatch_valid_move[(suc1 and suc2)](
             player_id, cards)
         return suc, points_this_step
@@ -213,6 +221,10 @@ class Game():
     def _valid_move_routine(self, player_id, cards):
         """ Changes game state when player move is valid. """
         points_this_step = [0, 0, 0, 0]
+        # add cards to stack
+        suc = self.stack.add(cards)
+        if not suc:
+            raise RuntimeError('This should never happen...')
         # determine next active player
         if cards.cards[0].name == 'Dog':
             teammate = self._get_teammate(player_id)
@@ -353,10 +365,12 @@ class Game():
                 self.players[i].tichu_flag = False
         return tichu_points_this_step
 
-    def _invalid_move_routine(self, player_id, *unused_args):
+    def _invalid_move_routine(self, player_id, cards):
         points_this_step = [0, 0, 0, 0]
         if self.verbose > 1:
             print('Invalid move by player {0}'.format(player_id))
+            print('Player {0} tried to play:'.format(player_id))
+            cards.show()
         return False, points_this_step
 
     def _dragon_stack(self):
