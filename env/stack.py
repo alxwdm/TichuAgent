@@ -74,8 +74,8 @@ class Stack():
             self._update()
             suc = True
         # if stack not empty, cards_to_add must be same type and higher power
-        elif (self.type == cards_to_add.type
-              and self.power < cards_to_add.power):
+        elif (self.type == cards_to_add.type and
+              self.power < cards_to_add.power):
             # for straight and pair_seq, equal lengths are required
             if (self.type == 'straight' and
                   not self.cards[-1].size == cards_to_add.size):
@@ -105,6 +105,44 @@ class Stack():
         elif cards_to_add.type in BOMBS and self.power < cards_to_add.power:
             self.cards.append(cards_to_add)
             self._update()
+            suc = True
+        # illegal move
+        else:
+            suc = False
+        return suc
+
+    def assert_valid_move(self, cards_to_add):
+        """ Checks whether cards_to_add can be added to current stack. """
+        suc = bool()
+        # all but hand and pass can be played on empty stack
+        if (not(self.cards) and
+              cards_to_add.type != 'hand' and
+              cards_to_add.type != 'pass'):
+            suc = True
+        # if stack not empty, cards_to_add must be same type and higher power
+        elif (self.type == cards_to_add.type and
+              self.power < cards_to_add.power):
+            # for straight and pair_seq, equal lengths are required
+            if (self.type == 'straight' and
+                  not self.cards[-1].size == cards_to_add.size):
+                suc = False
+            elif (self.type == 'pair_seq' and
+                  not self.cards[-1].size == cards_to_add.size):
+                suc = False
+            # Dog can only be played as first card
+            elif cards_to_add.cards[0].name == 'Dog':
+                suc = False
+            # append and update stack if successful move
+            else:
+                suc = True
+        # special moves: Phoenix can be played on solo (except Dragon)
+        elif (self.type == 'solo' and
+              cards_to_add.type == 'solo' and
+              cards_to_add.phoenix_flag and
+              self.power < 15):
+            suc = True
+        # bombs can be played any time
+        elif cards_to_add.type in BOMBS and self.power < cards_to_add.power:
             suc = True
         # illegal move
         else:
