@@ -34,8 +34,10 @@ GAMMA = 0.99            # discount factor
 LR_ACTOR = 1e-3         # learning rate of the actor 
 LR_CRITIC = 1e-3        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
-FC_UNITS_1 = 128        # Units of first hidden layer (both actor and critic)
-FC_UNITS_2 = 128        # Units of second hidden layer (both actor and critic)
+FC_UNITS_1 = 256        # Units of first hidden layer (both actor and critic)
+FC_UNITS_2 = 256        # Units of second hidden layer (both actor and critic)
+FC_UNITS_3 = 128        # Units of third hidden layer (both actor and critic)
+FC_UNITS_4 = 64         # Units of 4th hidden layer (both actor and critic)
 
 # State and action type setting
 STATE_TYPE = 'suitless'
@@ -66,17 +68,21 @@ class DDPGAgent():
 
         # Actor Network (w/ Target Network)
         self.actor_local = Actor(state_size, action_size, random_seed,
-                                 FC_UNITS_1, FC_UNITS_2).to(device)
+                                 FC_UNITS_1, FC_UNITS_2, FC_UNITS_3, 
+                                 FC_UNITS_4).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed,
-                                  FC_UNITS_1, FC_UNITS_2).to(device)
+                                  FC_UNITS_1, FC_UNITS_2, FC_UNITS_3, 
+                                  FC_UNITS_4).to(device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(),
                                           lr=LR_ACTOR)
 
         # Critic Network (w/ Target Network)
         self.critic_local = Critic(state_size, action_size, random_seed,
-                                   FC_UNITS_1, FC_UNITS_2).to(device)
+                                   FC_UNITS_1, FC_UNITS_2, FC_UNITS_3, 
+                                   FC_UNITS_4).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed,
-                                    FC_UNITS_1, FC_UNITS_2).to(device)
+                                   FC_UNITS_1, FC_UNITS_2, FC_UNITS_3, 
+                                   FC_UNITS_4).to(device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(),
                                            lr=LR_CRITIC,
                                            weight_decay=WEIGHT_DECAY)
