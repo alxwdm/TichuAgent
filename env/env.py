@@ -8,7 +8,7 @@ from env.cards import Cards
 from env.deck import Deck
 from env.game import Game
 
-ILLEGAL_MOVE_PENALTY = -10
+ILLEGAL_MOVE_PENALTY = -300
 REWARD_STYLE  = 'rich'
 
 class Env():
