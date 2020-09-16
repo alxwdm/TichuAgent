@@ -8,7 +8,7 @@ from env.cards import Cards
 from env.deck import Deck
 from env.game import Game
 
-ILLEGAL_MOVE_PENALTY = -300
+ILLEGAL_MOVE_PENALTY = -300 # default value
 REWARD_STYLE  = 'rich'
 
 class Env():
@@ -89,7 +89,8 @@ class Env():
       Takes a step in the Game and updates state, action, rewards, done.
     """
 
-    def __init__(self, train_mode=True):
+    def __init__(self, train_mode=True,
+                 illegal_move_penalty=ILLEGAL_MOVE_PENALTY):
         """
         Constructs a Tichu Environment for RL.
 
@@ -114,6 +115,7 @@ class Env():
         self.state = [[None], [None], [None], [None]]
         self.rewards = [None, None, None, None]
         self.done = False
+        self.illegal_move_penalty = illegal_move_penalty
         self.nstep = 0 # only relevant for rich rewards
 
     def reset(self):
@@ -144,7 +146,7 @@ class Env():
         suc, points_this_step = self.game.step(player_id, cards)
         # illegal move
         if not suc:
-            self.rewards[player_id] = ILLEGAL_MOVE_PENALTY
+            self.rewards[player_id] = self.illegal_move_penalty
         # legal move
         else:
             self._update_action_buffer(player_id, action)
