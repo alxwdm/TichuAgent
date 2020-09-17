@@ -21,7 +21,7 @@ If you want to train your own agents, you can create and interact with the envir
 
      env = Env()
      state, rewards, done, active_player = env.reset()
-     (...)
+     (...) # let an agent decide the action
      state, rewards, done, active_player = env.step(active_player, action)
 
 For a detailed description of the environment, see contents below.
@@ -34,3 +34,4 @@ Contents
     
     environment
     agents
+    rules
