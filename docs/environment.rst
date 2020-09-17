@@ -20,33 +20,33 @@ Use the environment to train and test an agent: ::
     (...) # let the agent choose an action according to its policy
     next_state, rewards, done, active_player = env.step(active_player, action)
 
-You will recieve a nicely printed history of the game by setting the train_mode attribute to False. Please note that depending on the device, it may be necessary to change the image attribute of class ``Card`` to display the cards correctly. ::
+You will recieve a nicely printed history of the game by setting the train_mode attribute to False. Please note that depending on the device, it may be necessary to change the image attribute of class ``Card`` to display the cards correctly (as you can see, the rst Code block does not look as nice as the Python console output). ::
 
     env = Env(train_mode=False)
     (...) # play a game
     Example output:
     Player 1 plays pair_seq.
-    ┍┄┄┄┄┄┑┍┄┄┄┄┄┑┍┄┄┄┄┄┑┍┄┄┄┄┄┑
-    ┆ 8   ┆┆ 8   ┆┆ 9   ┆┆ 9   ┆
-    ┆  ♥  ┆┆  ⬧  ┆┆  ⬧  ┆┆  ♣  ┆
-    ┆   8 ┆┆   8 ┆┆   9 ┆┆   9 ┆
-    ┖┄┄┄┄┄┚┖┄┄┄┄┄┚┖┄┄┄┄┄┚┖┄┄┄┄┄┚
+    ┍┄┄┄┄┑  ┍┄┄┄┄┑  ┍┄┄┄┄┑ ┍┄┄┄┄┑
+    ┆10   ┆ ┆10   ┆ ┆ J   ┆ ┆ J   ┆
+    ┆  ♥  ┆ ┆  ⬧  ┆ ┆  ⬧  ┆ ┆  ♣  ┆
+    ┆   10┆ ┆   10┆ ┆   J ┆ ┆   J ┆
+    ┖┄┄┄┄┚  ┖┄┄┄┄┚ ┖┄┄┄┄┚  ┖┄┄┄┄┚
     Player 2 plays pair_seq.
-    ┍┄┄┄┄┄┑┍┄┄┄┄┄┑┍┄┄┄┄┄┑┍┄┄┄┄┄┑
-    ┆ Q   ┆┆ Q   ┆┆ K   ┆┆ K   ┆
-    ┆  ♣  ┆┆  ♠  ┆┆  ⬧  ┆┆  ♣  ┆
-    ┆   Q ┆┆   Q ┆┆   K ┆┆   K ┆
-    ┖┄┄┄┄┄┚┖┄┄┄┄┄┚┖┄┄┄┄┄┚┖┄┄┄┄┄┚
+    ┍┄┄┄┄┑  ┍┄┄┄┄┑  ┍┄┄┄┄┑ ┍┄┄┄┄┑
+    ┆ Q   ┆ ┆ Q   ┆ ┆ K   ┆ ┆ K   ┆
+    ┆  ♣  ┆ ┆  ♠  ┆ ┆  ⬧  ┆ ┆  ♣  ┆
+    ┆   Q ┆ ┆   Q ┆ ┆   K ┆ ┆   K ┆
+    ┖┄┄┄┄┚  ┖┄┄┄┄┚  ┖┄┄┄┚  ┖┄┄┄┄┚
     Player 3 passes.
     Player 0 passes.
     Player 1 passes,
     Player 2 has won the stack (20 points).
     Player 2 plays solo.
-    ┍┄┄┄┄┄┑
-    ┆ 2   ┆
-    ┆  ♣  ┆
-    ┆   2 ┆
-    ┖┄┄┄┄┄┚
+     ┍┄┄┄┄┑
+    ┆ 2    ┆
+    ┆  ♣   ┆
+    ┆   2  ┆
+     ┖┄┄┄┄┚
     (...)
 
 State Design and Augmentation
