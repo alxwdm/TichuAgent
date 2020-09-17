@@ -20,7 +20,8 @@ Use the environment to train and test an agent: ::
     (...) # let the agent choose an action according to its policy
     next_state, rewards, done, active_player = env.step(active_player, action)
 
-You will recieve a nicely printed history of the game by setting the train_mode attribute to false. Please note that depending on the device, it may be necessary to change the image attribute of class ``Card`` to display the cards correctly.::
+You will recieve a nicely printed history of the game by setting the train_mode attribute to False. Please note that depending on the device, it may be necessary to change the image attribute of class ``Card`` to display the cards correctly. ::
+
     env = Env(train_mode=False)
     (...) # play a game
     Example output:
@@ -59,6 +60,7 @@ At the beginning and at each consecutive step, the environment outputs a state. 
 In this particular case, the state depends on the point of view of the respective player. This means the environment outputs a list of four states from each players' perspective. Each (sub-)state must contain the hand cards of the player, obviously. Furthermore, the hand size of all four players is an important information in order to play successfully, and also which players (if any) have called Tichu. Finally, the last move of all players in the current stack is important to determine who is leading and which combination type and power needs to be beaten.
 
 Considering all of the above, the state of ``player[i]`` looks as follows: ::
+
     [hand size, Tichu flag, hand cards*] of player i
     [hand size, Tichu flag, played cards*] of player i+1 (= left opponent)
     [hand size, Tichu flag, played cards*] of player i+2 (= vis-a-vis teammate)
@@ -82,6 +84,7 @@ Action Design and Augmentation
 ------------------------------
 
 As the available cards of the raw state are binary encodings of all 56 cards in a Tichu deck, the action is likewise. For example: ::
+
     # Tichu deck representation:
     [2_Spades, 2_Heart, 2_Diamond, 2_Clubs, 3_Spades, 3_Heart, 3_Diamond, 3_Clubs, ..., Phoenix, Dragon, Majong, Dog]
     # Encoding of a pair of 2s:
