@@ -40,8 +40,8 @@ FC_UNITS_3 = 128        # Units of third hidden layer (both actor and critic)
 FC_UNITS_4 = 64         # Units of 4th hidden layer (both actor and critic)
 
 # State and action type setting
-STATE_TYPE = 'suitless'
-ACTION_TYPE = 'suitless'
+STATE_STYLE = 'suitless'
+ACTION_STYLE = 'suitless'
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -91,13 +91,23 @@ class DDPGAgent():
         self.memory = DequeReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE,
                                         random_seed)
     
-        # State and action augmentation
-        self.dispatch_state = {'default': self._flatten_state,
-                               'suitless': self._state_conv_suitless}
-        self.dispatch_action_out = {'default': self._default_action,
-                               'suitless': self._action_suitless_to_default}
-        self.dispatch_action_in = {'default': self._default_action,
-                               'suitless': self._action_default_to_suitless}
+        # State and action augmentation to simplify/accelerate learning
+        self.dispatch_state = {
+                        'default': self._flatten_state,
+                        'suitless': self._state_conv_suitless
+                        }
+        self.dispatch_action_out = {
+                        'default': self._default_action,
+                        'suitless': self._action_suitless_to_default,
+                        'combination': self._action_comb_to_default,
+                        'binary': self._action_binary_to_default
+                        }
+        self.dispatch_action_in = {
+                        'default': self._default_action,
+                        'suitless': self._action_default_to_suitless,
+                        'combination': self._action_default_to_combination,
+                        'binary': self._action_default_to_binary
+                        }
 
     def step(self, state, action, reward, next_state, done, timestep):
         """
@@ -120,9 +130,9 @@ class DDPGAgent():
         """
         # augmentation of states and action
         raw_state = state
-        state = self.dispatch_state[STATE_TYPE](state)
-        next_state = self.dispatch_state[STATE_TYPE](next_state)
-        action = self.dispatch_action_in[ACTION_TYPE](action)
+        state = self.dispatch_state[STATE_STYLE](state)
+        next_state = self.dispatch_state[STATE_STYLE](next_state)
+        action = self.dispatch_action_in[ACTION_STYLE](action)
         # Save experience (state, action, reward, next_state, done) tuple
         self.memory.add(state, action, reward, next_state, done)
         # Learning process:
@@ -134,21 +144,26 @@ class DDPGAgent():
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
 
-    def act(self, state, eps):
+    def act(self, state, eps=0, debug=False):
         """ Returns actions for given state as per current policy. """
         if random.random() > eps:
-            np_state = self.dispatch_state[STATE_TYPE](state)
+            np_state = self.dispatch_state[STATE_STYLE](state)
             torch_state = torch.from_numpy(np_state).float().to(device)
             self.actor_local.eval()
             with torch.no_grad():
                 action = self.actor_local(torch_state).cpu().data.numpy()
             self.actor_local.train()
+            # print N.N. output for debugging
+            if debug:
+                print('action (before conversion): ', action)
             # convert action to env format if necessary
-            action = self.dispatch_action_out[ACTION_TYPE](action, state)
+            action = self.dispatch_action_out[ACTION_STYLE](action, state)
             eps_move = False
         else:
             action = self.heuristic_agent.act(state)
             eps_move = True
+            if debug:
+                print('eps move!')
         return np.rint(action), eps_move
 
     def reset(self):
@@ -288,35 +303,9 @@ class DDPGAgent():
                     for e in elem:
                         flattened_state.append(e)
             return np.asarray(flattened_state, dtype='int32')
-
-        # get info from full state
-        hand_cards = _vec_to_cards(state_vec[0][2])
-        opp_cards_0 = _vec_to_cards(state_vec[1][2])
-        teammate_cards = _vec_to_cards(state_vec[2][2])
-        opp_cards_1 = _vec_to_cards(state_vec[3][2])
-        # determine leading cards
-        # new stack
-        if (teammate_cards.type == 'pass' and opp_cards_0.type == 'pass' and 
-                opp_cards_1.type == 'pass'):
-            leading_idx = 0
-            is_opponent = 0
-            leading_cards = Cards([])
-        # teammate leading
-        elif teammate_cards.power > max(opp_cards_0.power, opp_cards_1.power):
-            leading_idx = 2
-            is_opponent = 0
-            leading_cards = teammate_cards
-        # opponent 0 leading
-        elif ((opp_cards_0.power > opp_cards_1.power) or 
-                (opp_cards_1.type == 'pass')):
-            leading_idx = 1
-            is_opponent = 1
-            leading_cards = opp_cards_0
-        # opponent 1 leading
-        else:
-            leading_idx = 3
-            is_opponent = 1
-            leading_cards = opp_cards_1
+        # get infos from default_state vector
+        leading_idx, is_opponent, leading_cards, leading_type = \
+          self._get_info_from_state(default_state)
         # get first part of state: self perspective
         conv_state = []
         conv_state.append(state_vec[0][0]) # Hand Size
@@ -377,8 +366,47 @@ class DDPGAgent():
         action_vec[-1] = suitless_action[16]
         return action_vec
 
+    def _action_comb_to_default(self, comb_action, default_state):
+        """
+        Converts a "combination" action into action vector expected by env.
+
+        Based on the input state, the lowest action that beats the currently
+        highest combination is retuned.
+
+        Example:
+        comb_action: [0, 1, 0, 0, ...] for a solo card
+        action_vector: binary encoded action vector that beats leading player.
+        """
+        hand_cards = _vec_to_cards(state_vec[0][2])
+        leading_idx, is_opponent, leading_cards, leading_type = \
+          self._get_info_from_state(default_state)
+        raise NotImplementedError
+
+    def _action_binary_to_default(self, binary_action, default_state):
+        """
+        Converts a "binary" action into action vector expected by env.
+
+        Binary action is just pass or beat. If the action is "beat", then the
+        lowest available combination that beats the currently highest
+        combination is returned.
+
+        Example:
+        binary_action: [1] in order to beat the leading player
+        action_vector: binary encoded action vector that beats leading player.
+        """
+        # pass if action is "pass"
+        if binary_acton == 0:
+            action_vec = np.zeros(56, int)
+            return action_vec
+        # try to beat if action is "beat"
+        else:
+            hand_cards = _vec_to_cards(state_vec[0][2])
+            leading_idx, is_opponent, leading_cards, leading_type = \
+              self._get_info_from_state(default_state)
+        raise NotImplementedError
+
     def _action_default_to_suitless(self, default_action):
-        """ Converts an action expeced by the env to suitless action. """
+        """ Converts an action expeced by the env to "suitless" action. """
         action_vec = np.zeros(17, int)
         for i in range(13):
             action_vec[i] = sum(default_action[i*4:i*4+4])
@@ -387,3 +415,47 @@ class DDPGAgent():
         action_vec[15] = default_action[-2]
         action_vec[16] = default_action[-1]
         return action_vec
+
+    def _action_default_to_combination(self, default_action):
+        """ Converts an action expeced by the env to "combination" action. """
+        raise NotImplementedError
+
+    def _action_default_to_binary(self, default_action):
+        """ Converts an action expeced by the env to "binary" action. """
+        raise NotImplementedError
+
+    def _get_info_from_state(self, default_state):
+        """
+        Interprets the default state for state and action augmentation.
+        """
+        state_vec = default_state
+        # get info from full state
+        hand_cards = _vec_to_cards(state_vec[0][2])
+        opp_cards_0 = _vec_to_cards(state_vec[1][2])
+        teammate_cards = _vec_to_cards(state_vec[2][2])
+        opp_cards_1 = _vec_to_cards(state_vec[3][2])
+        # determine leading cards
+        # new stack
+        if (teammate_cards.type == 'pass' and opp_cards_0.type == 'pass' and 
+                opp_cards_1.type == 'pass'):
+            leading_idx = 0
+            is_opponent = 0
+            leading_cards = Cards([])
+        # teammate leading
+        elif teammate_cards.power > max(opp_cards_0.power, opp_cards_1.power):
+            leading_idx = 2
+            is_opponent = 0
+            leading_cards = teammate_cards
+        # opponent 0 leading
+        elif ((opp_cards_0.power > opp_cards_1.power) or 
+                (opp_cards_1.type == 'pass')):
+            leading_idx = 1
+            is_opponent = 1
+            leading_cards = opp_cards_0
+        # opponent 1 leading
+        else:
+            leading_idx = 3
+            is_opponent = 1
+            leading_cards = opp_cards_1
+        leading_type = leading_cards.type
+        return leading_idx, is_opponent, leading_cards, leading_type
