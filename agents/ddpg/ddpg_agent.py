@@ -41,7 +41,9 @@ FC_UNITS_4 = 64         # Units of 4th hidden layer (both actor and critic)
 
 # State and action type setting
 STATE_STYLE = 'suitless'
-ACTION_STYLE = 'suitless'
+ACTION_STYLE = 'binary'
+ACTION_DIMS = {'default': 56, 'suitless': 17, 'combination': 9, 'binary': 1}
+STATE_DIMS = {'default': 256, 'suitless': 39}
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -276,10 +278,6 @@ class DDPGAgent():
 
         returns state vector in flattened format
         """
-        def _vec_to_cards(vec):
-            """ Turns a vector representation into a Cards instance. """
-            all_cards = Deck().all_cards
-            return Cards(list(compress(all_cards, vec)))
 
         def suitless_enc(crd_state):
             """ Changes state to suitless encoding. """
@@ -394,16 +392,52 @@ class DDPGAgent():
         binary_action: [1] in order to beat the leading player
         action_vector: binary encoded action vector that beats leading player.
         """
+        comb_types = {'solo': 0, 'pair': 1, 'triple': 2, 'four_bomb': 3,
+                      'full': 4, 'straight': 5, 'straight_bomb': 6, 
+                      'pair_seq': 7}
         # pass if action is "pass"
         if binary_acton == 0:
-            action_vec = np.zeros(56, int)
-            return action_vec
+            action = self._cards_to_vec(Cards([]))
+            return action
         # try to beat if action is "beat"
+        hand_cards = self._vec_to_cards(state_vec[0][2])
+        available_combs = hand_cards.get_available_combinations()
+        leading_idx, is_opponent, leading_cards, leading_type = \
+          self._get_info_from_state(default_state)
+        type_index = comb_types[leading_type]
+        # check if leading type is available and can be beaten
+        if available_comb[type_index]:
+            phoenix_buffer = None
+            for crds in available_comb[type_index]:
+                if crds.cards[0].name == 'Dog': # Dog can only be played alone
+                    pass
+                elif crds.power > leading_power and crds.size == leading_size:
+                    # try to avoid using phoenix if possible
+                    if crds.phoenix_flag and not(phoenix_buffer):
+                        phoenix_buffer = crds
+                    else:
+                        action = self._cards_to_vec(crds)
+                        return action
+            if phoenix_buffer:
+                action = self._cards_to_vec(phoenix_buffer)
+                return action
+            # pass if no higher combination available
+            action = self._cards_to_vec(Cards([]))
+            return action
+        # if no combination exists, try to four bomb or straight bomb
+        elif available_comb[comb_types['four_bomb']] and 
+              not(leading_type == 'straight_bomb'):
+            bomb = available_comb[comb_types['four_bomb']][0]
+            action = self._cards_to_vec(bomb)
+            return action
+        elif available_comb[comb_types['straight_bomb']]:
+            bomb = available_comb[comb_types['straight_bomb']][0]
+            action = self._cards_to_vec(bomb)
+            return action
+        # pass if opponent cannot be beaten
         else:
-            hand_cards = _vec_to_cards(state_vec[0][2])
-            leading_idx, is_opponent, leading_cards, leading_type = \
-              self._get_info_from_state(default_state)
-        raise NotImplementedError
+            action = self._cards_to_vec(Cards([]))
+            return action
 
     def _action_default_to_suitless(self, default_action):
         """ Converts an action expeced by the env to "suitless" action. """
@@ -422,7 +456,12 @@ class DDPGAgent():
 
     def _action_default_to_binary(self, default_action):
         """ Converts an action expeced by the env to "binary" action. """
-        raise NotImplementedError
+        crds = self._vec_to_cards(default_action)
+        if crd.type == 'pass':
+            action = 0
+        else:
+            action = 1
+        return action
 
     def _get_info_from_state(self, default_state):
         """
@@ -430,10 +469,10 @@ class DDPGAgent():
         """
         state_vec = default_state
         # get info from full state
-        hand_cards = _vec_to_cards(state_vec[0][2])
-        opp_cards_0 = _vec_to_cards(state_vec[1][2])
-        teammate_cards = _vec_to_cards(state_vec[2][2])
-        opp_cards_1 = _vec_to_cards(state_vec[3][2])
+        hand_cards = self._vec_to_cards(state_vec[0][2])
+        opp_cards_0 = self._vec_to_cards(state_vec[1][2])
+        teammate_cards = self._vec_to_cards(state_vec[2][2])
+        opp_cards_1 = self._vec_to_cards(state_vec[3][2])
         # determine leading cards
         # new stack
         if (teammate_cards.type == 'pass' and opp_cards_0.type == 'pass' and 
@@ -459,3 +498,14 @@ class DDPGAgent():
             leading_cards = opp_cards_1
         leading_type = leading_cards.type
         return leading_idx, is_opponent, leading_cards, leading_type
+
+    def _cards_to_vec(self, cards):
+        vec = np.zeros(len(self.all_cards), int)
+        for i in range(len(self.all_cards)):
+            crd = Cards([self.all_cards[i]])
+            if cards.contains(crd):
+                vec[i] = 1
+        return vec.tolist()
+
+    def _vec_to_cards(self, vec):
+        return Cards(list(compress(self.all_cards, vec)))
