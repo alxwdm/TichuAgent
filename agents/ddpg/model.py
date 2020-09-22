@@ -20,7 +20,8 @@ class Actor(nn.Module):
     """Actor (Policy) Model."""
 
     def __init__(self, state_size, action_size, seed,
-                 fc1_units=256, fc2_units=256, fc3_units=128, fc4_units=64):
+                 fc1_units=256, fc2_units=256, fc3_units=128, fc4_units=64,
+                 actor_style='default'):
         """
         Initialize parameters and build model.
         
@@ -48,6 +49,7 @@ class Actor(nn.Module):
         self.fc4 = nn.Linear(fc3_units, fc4_units)
         self.bn4 = nn.BatchNorm1d(fc4_units)
         self.fc5 = nn.Linear(fc4_units, action_size)
+        self.actor_style = actor_style
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -64,7 +66,15 @@ class Actor(nn.Module):
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
         x = F.relu(self.fc4(x))
-        return F.relu(self.fc5(x))
+        # set activation based on action style
+        if self.actor_style == 'default':
+            return F.sigmoid(self.fc5(x))
+        if self.actor_style == 'suitless':
+            return F.relu(self.fc5(x)) # TODO: replace with hardtan 0...4
+        if self.actor_style == 'combination':
+            return F.softmax(self.fc5(x))
+        if self.actor_style == 'binary':
+            return F.sigmoid(self.fc5(x))
 
 class Critic(nn.Module):
     """Critic (Value) Model."""

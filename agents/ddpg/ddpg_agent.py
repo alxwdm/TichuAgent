@@ -50,7 +50,9 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class DDPGAgent():
     """ An agent that interacts with and learns from the environment. """
     
-    def __init__(self, state_size, action_size, random_seed, heuristic_agent):
+    def __init__(self, state_size=STATE_DIMS[STATE_STYLE], 
+                  action_size=ACTION_DIMS[ACTION_STYLE], 
+                  random_seed, heuristic_agent):
         """
         Initializes an Agent object.
         
@@ -71,10 +73,10 @@ class DDPGAgent():
         # Actor Network (w/ Target Network)
         self.actor_local = Actor(state_size, action_size, random_seed,
                                  FC_UNITS_1, FC_UNITS_2, FC_UNITS_3, 
-                                 FC_UNITS_4).to(device)
+                                 FC_UNITS_4, ACTION_STYLE).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed,
                                   FC_UNITS_1, FC_UNITS_2, FC_UNITS_3, 
-                                  FC_UNITS_4).to(device)
+                                  FC_UNITS_4, ACTION_STYLE).to(device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(),
                                           lr=LR_ACTOR)
 
@@ -160,6 +162,8 @@ class DDPGAgent():
                 print('action (before conversion): ', action)
             # convert action to env format if necessary
             action = self.dispatch_action_out[ACTION_STYLE](action, state)
+            if debug:
+                print('action (after conversion): ', np.rint(action))            
             eps_move = False
         else:
             action = self.heuristic_agent.act(state)
@@ -404,8 +408,11 @@ class DDPGAgent():
         available_combs = hand_cards.get_available_combinations()
         leading_idx, is_opponent, leading_cards, leading_type = \
           self._get_info_from_state(default_state)
+        if leading_type == 'pass':
+            # TODO: what action to take if stack is empty?
+            raise NotImplementedError
         type_index = comb_types[leading_type]
-        # check if leading type is available and can be beaten
+        # check if leading type combination is available and can be beaten
         if available_comb[type_index]:
             phoenix_buffer = None
             for crds in available_comb[type_index]:
@@ -452,7 +459,16 @@ class DDPGAgent():
 
     def _action_default_to_combination(self, default_action):
         """ Converts an action expeced by the env to "combination" action. """
-        raise NotImplementedError
+        comb_types = {'solo': 0, 'pair': 1, 'triple': 2, 'four_bomb': 3,
+                      'full': 4, 'straight': 5, 'straight_bomb': 6, 
+                      'pair_seq': 7}
+        action = np.zeros(9, int)
+        action_type = self._vec_to_cards(default_action).type
+        if action_type == 'pass':
+            action[0] = 1
+        else:
+            action[comb_types[action_type]+1] = 1
+        return action
 
     def _action_default_to_binary(self, default_action):
         """ Converts an action expeced by the env to "binary" action. """
