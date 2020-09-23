@@ -52,7 +52,7 @@ class DDPGAgent():
     
     def __init__(self, state_size=STATE_DIMS[STATE_STYLE], 
                   action_size=ACTION_DIMS[ACTION_STYLE], 
-                  random_seed, heuristic_agent):
+                  random_seed=0, heuristic_agent=None):
         """
         Initializes an Agent object.
         
@@ -150,7 +150,7 @@ class DDPGAgent():
 
     def act(self, state, eps=0, debug=False):
         """ Returns actions for given state as per current policy. """
-        if random.random() > eps:
+        if random.random() > eps or not(self.heuristic_agent):
             np_state = self.dispatch_state[STATE_STYLE](state)
             torch_state = torch.from_numpy(np_state).float().to(device)
             self.actor_local.eval()
@@ -307,7 +307,7 @@ class DDPGAgent():
             return np.asarray(flattened_state, dtype='int32')
         # get infos from default_state vector
         leading_idx, is_opponent, leading_cards, leading_type = \
-          self._get_info_from_state(default_state)
+          self._get_info_from_state(state_vec)
         # get first part of state: self perspective
         conv_state = []
         conv_state.append(state_vec[0][0]) # Hand Size
@@ -400,22 +400,49 @@ class DDPGAgent():
                       'full': 4, 'straight': 5, 'straight_bomb': 6, 
                       'pair_seq': 7}
         # pass if action is "pass"
-        if binary_acton == 0:
+        if binary_action == 0:
             action = self._cards_to_vec(Cards([]))
             return action
         # try to beat if action is "beat"
-        hand_cards = self._vec_to_cards(state_vec[0][2])
+        hand_cards = self._vec_to_cards(default_state[0][2])
         available_combs = hand_cards.get_available_combinations()
         leading_idx, is_opponent, leading_cards, leading_type = \
           self._get_info_from_state(default_state)
+        leading_power = leading_cards.power
+        leading_size = leading_cards.size
         if leading_type == 'pass':
-            # TODO: what action to take if stack is empty?
-            raise NotImplementedError
+            # what action to take if stack is empty?
+            # Heuristic: Try to play most complex combination
+            # Straight, pair_seq, full, triple, pair, solo
+            if available_combs[comb_types['straight']]:
+                crds = available_combs[comb_types['straight']][0]
+                action = self._cards_to_vec(crds)
+                return action
+            if available_combs[comb_types['pair_seq']]:
+                crds = available_combs[comb_types['pair_seq']][0]
+                action = self._cards_to_vec(crds)
+                return action
+            if available_combs[comb_types['full']]:
+                crds = available_combs[comb_types['full']][0]
+                action = self._cards_to_vec(crds)
+                return action
+            if available_combs[comb_types['triple']]:
+                crds = available_combs[comb_types['triple']][0]
+                action = self._cards_to_vec(crds)
+                return action
+            if available_combs[comb_types['pair']]:
+                crds = available_combs[comb_types['pair']][0]
+                action = self._cards_to_vec(crds)
+                return action
+            if available_combs[comb_types['solo']]:
+                crds = available_combs[comb_types['solo']][0]
+                action = self._cards_to_vec(crds)
+                return action
         type_index = comb_types[leading_type]
         # check if leading type combination is available and can be beaten
-        if available_comb[type_index]:
+        if available_combs[type_index]:
             phoenix_buffer = None
-            for crds in available_comb[type_index]:
+            for crds in available_combs[type_index]:
                 if crds.cards[0].name == 'Dog': # Dog can only be played alone
                     pass
                 elif crds.power > leading_power and crds.size == leading_size:
@@ -432,13 +459,13 @@ class DDPGAgent():
             action = self._cards_to_vec(Cards([]))
             return action
         # if no combination exists, try to four bomb or straight bomb
-        elif available_comb[comb_types['four_bomb']] and 
-              not(leading_type == 'straight_bomb'):
-            bomb = available_comb[comb_types['four_bomb']][0]
+        elif (available_combs[comb_types['four_bomb']] and 
+              not(leading_type == 'straight_bomb')):
+            bomb = available_combs[comb_types['four_bomb']][0]
             action = self._cards_to_vec(bomb)
             return action
-        elif available_comb[comb_types['straight_bomb']]:
-            bomb = available_comb[comb_types['straight_bomb']][0]
+        elif available_combs[comb_types['straight_bomb']]:
+            bomb = available_combs[comb_types['straight_bomb']][0]
             action = self._cards_to_vec(bomb)
             return action
         # pass if opponent cannot be beaten
@@ -473,7 +500,7 @@ class DDPGAgent():
     def _action_default_to_binary(self, default_action):
         """ Converts an action expeced by the env to "binary" action. """
         crds = self._vec_to_cards(default_action)
-        if crd.type == 'pass':
+        if crds.type == 'pass':
             action = 0
         else:
             action = 1
@@ -516,12 +543,13 @@ class DDPGAgent():
         return leading_idx, is_opponent, leading_cards, leading_type
 
     def _cards_to_vec(self, cards):
-        vec = np.zeros(len(self.all_cards), int)
-        for i in range(len(self.all_cards)):
-            crd = Cards([self.all_cards[i]])
+        all_cards = Deck().all_cards
+        vec = np.zeros(len(all_cards), int)
+        for i in range(len(all_cards)):
+            crd = Cards([all_cards[i]])
             if cards.contains(crd):
                 vec[i] = 1
         return vec.tolist()
 
     def _vec_to_cards(self, vec):
-        return Cards(list(compress(self.all_cards, vec)))
+        return Cards(list(compress(Deck().all_cards, vec)))
